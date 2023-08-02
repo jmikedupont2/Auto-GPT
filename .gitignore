@@ -160,3 +160,12 @@ openai/
 
 # news
 CURRENT_BULLETIN.md
+
+# nodejs
+node_modules/
+package-lock.json
+package.json
+
+# Benchmarks
+agbenchmark/reports/*
+agbenchmark/regression_tests.json
