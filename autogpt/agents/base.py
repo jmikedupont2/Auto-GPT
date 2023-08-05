@@ -95,7 +95,7 @@ class BaseAgent(metaclass=ABCMeta):
         self,
         instruction: Optional[str] = None,
         thought_process_id: ThoughtProcessID = "one-shot",
-    ) -> tuple[CommandName | None, CommandArgs | None, AgentThoughts]:
+    ) -> tuple[list[tuple[CommandName | None, CommandArgs | None]], AgentThoughts]:
         """Runs the agent for one cycle.
 
         Params:
@@ -240,10 +240,10 @@ class BaseAgent(metaclass=ABCMeta):
                 // Summary of thoughts to say to the user
                 speak: string;
             };
-            command: {
+            commands: [{
                 name: string;
                 args: Record<string, any>;
-            };
+            }, ...];
         }
         ```"""
 
@@ -323,7 +323,7 @@ class BaseAgent(metaclass=ABCMeta):
         thought_process_id: ThoughtProcessID,
         prompt: ChatSequence,
         instruction: str,
-    ) -> tuple[CommandName | None, CommandArgs | None, AgentThoughts]:
+    ) -> tuple[list[tuple[CommandName | None, CommandArgs | None]], AgentThoughts]:
         """Called upon receiving a response from the chat model.
 
         Adds the last/newest message in the prompt and the response to `history`,
@@ -356,7 +356,7 @@ class BaseAgent(metaclass=ABCMeta):
                 f"Your response could not be parsed: {e}"
                 "\n\nRemember to only respond using the specified format above!",
             )
-            return None, None, {}
+            return (None, None), {}
 
         # TODO: update memory/context
 
@@ -367,7 +367,7 @@ class BaseAgent(metaclass=ABCMeta):
         thought_process_id: ThoughtProcessID,
         prompt: ChatSequence,
         instruction: str,
-    ) -> tuple[CommandName | None, CommandArgs | None, AgentThoughts]:
+    ) -> tuple[list[tuple[CommandName | None, CommandArgs | None]], AgentThoughts]:
         """Validate, parse & process the LLM's response.
 
         Must be implemented by derivative classes: no base implementation is provided,

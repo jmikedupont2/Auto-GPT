@@ -5,3 +5,6 @@
 [submodule "agbenchmark/challenges"]
 	path = agbenchmark/challenges
 	url = https://github.com/agbenchmark/agbenchmark_challenges.git
+[submodule "challenges"]
+	path = challenges
+	url = https://github.com/agbenchmark/agbenchmark_challenges.git

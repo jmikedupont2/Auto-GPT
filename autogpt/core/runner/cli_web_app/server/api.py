@@ -83,7 +83,7 @@ def bootstrap_agent(task, continuous_mode) -> Agent:
     config = ConfigBuilder.build_config_from_env(workdir=PROJECT_DIR)
     config.debug_mode = True
     config.continuous_mode = continuous_mode
-    config.temperature = 0
+    config.temperature = 0.2
     config.plain_output = True
     command_registry = CommandRegistry.with_command_modules(COMMAND_CATEGORIES, config)
     config.memory_backend = "no_memory"

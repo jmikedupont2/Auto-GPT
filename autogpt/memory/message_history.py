@@ -102,7 +102,18 @@ Latest Development:
             user_message = (
                 messages[i - 1] if i > 0 and messages[i - 1].role == "user" else None
             )
-            result_message = messages[i + 1]
+            # Handle multiple results per action
+            # Find all the following consecutive messages that are action results
+            result_message = None
+            for j in range(i + 1, len(messages)):
+                if messages[j].type == "action_result":
+                    if result_message is None:
+                        result_message = messages[j]
+                    else:
+                        result_message.content += "\n" + messages[j].content
+                else:
+                    break
+
             try:
                 assert (
                     extract_dict_from_response(ai_message.content) != {}
@@ -112,7 +123,7 @@ Latest Development:
                 yield user_message, ai_message, result_message
             except AssertionError as err:
                 logger.debug(
-                    f"Invalid item in message history: {err}; Messages: {messages[i-1:i+2]}"
+                    f"Invalid item in message history: {err}; Messages: {messages[i-1:j]}"
                 )
 
     def summary_message(self) -> Message:

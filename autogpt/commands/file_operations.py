@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from enum import Enum
+
 COMMAND_CATEGORY = "file_operations"
 COMMAND_CATEGORY_TITLE = "File Operations"
 
@@ -10,7 +12,7 @@ import hashlib
 import os
 import os.path
 from pathlib import Path
-from typing import Generator, Literal
+from typing import Generator, Literal, Optional
 
 from autogpt.agents.agent import Agent
 from autogpt.command_decorator import command
@@ -19,6 +21,13 @@ from autogpt.memory.vector import MemoryItem, VectorMemory
 
 from .decorators import sanitize_path_arg
 from .file_operations_utils import read_textual_file
+
+
+class Operations(Enum):
+    WRITE = "write"
+    APPEND = "append"
+    DELETE = "delete"
+
 
 Operation = Literal["write", "append", "delete"]
 
@@ -30,7 +39,7 @@ def text_checksum(text: str) -> str:
 
 def operations_from_log(
     log_path: str | Path,
-) -> Generator[tuple[Operation, str, str | None], None, None]:
+) -> Generator[tuple[Operation, str, Optional[str]], None, None,]:
     """Parse the file operations log and return a tuple containing the log entries"""
     try:
         log = open(log_path, "r", encoding="utf-8")
@@ -49,14 +58,14 @@ def operations_from_log(
             except ValueError:
                 logger.warn(f"File log entry lacks checksum: '{line}'")
                 path, checksum = tail.strip(), None
-            yield (operation, path, checksum)
+            yield (Operations[operation.upper()].value, path, checksum)
         elif operation == "delete":
-            yield (operation, tail.strip(), None)
+            yield (Operations.DELETE.value, tail.strip(), None)
 
     log.close()
 
 
-def file_operations_state(log_path: str | Path) -> dict[str, str]:
+def file_operations_state(log_path: str | Path) -> dict[str, Optional[str]]:
     """Iterates over the operations log and returns the expected state.
 
     Parses a log file at config.file_logger_path to construct a dictionary that maps
@@ -192,7 +201,7 @@ def ingest_file(
 
 @command(
     "write_to_file",
-    "Writes to a file",
+    "Writes to a file. if_exists: prepend, append, overwrite, skip or fail.",
     {
         "filename": {
             "type": "string",
@@ -204,32 +213,63 @@ def ingest_file(
             "description": "The text to write to the file",
             "required": True,
         },
+        "if_exists": {
+            "type": "string",
+            "description": "One of 'overwrite', 'prepend', 'append', 'skip' or 'fail'",
+            "required": True,
+        },
     },
     aliases=["write_file", "create_file"],
 )
 @sanitize_path_arg("filename")
-def write_to_file(filename: str, text: str, agent: Agent) -> str:
+def write_to_file(filename: str, text: str, if_exists: str, agent: Agent) -> str:
     """Write text to a file
 
     Args:
         filename (str): The name of the file to write to
         text (str): The text to write to the file
+        if_exists (str): One of 'overwrite', 'prepend', 'append', 'skip' or 'fail'
 
     Returns:
         str: A message indicating success or failure
     """
+    ACTIONS = {
+        "overwrite": lambda p, _txt: p.write_text(_txt, encoding="utf-8"),
+        "prepend": lambda p, _txt: p.write_text(_txt + p.read_text(encoding="utf-8")),
+        "append": lambda p, _txt: open(p, "a", encoding="utf-8").write(_txt),
+        "skip": (
+            lambda p, _txt: "File exists, skipping."
+            if p.exists()
+            else p.write_text(_txt, encoding="utf-8")
+        ),
+        "fail": (
+            lambda p, _txt: "Error: File exists, failing."
+            if p.exists()
+            else p.write_text(_txt, encoding="utf-8")
+        ),
+    }
+
     checksum = text_checksum(text)
     if is_duplicate_operation("write", filename, agent, checksum):
         return "Error: File has already been updated."
+
+    path = Path(filename)
+    directory = path.parent
+    os.makedirs(directory, exist_ok=True)
+
     try:
-        directory = os.path.dirname(filename)
-        os.makedirs(directory, exist_ok=True)
-        with open(filename, "w", encoding="utf-8") as f:
-            f.write(text)
-        log_operation("write", filename, agent, checksum)
+        result = ACTIONS.get(
+            if_exists, lambda p, _txt: "Error: Invalid value for 'if_exists'."
+        )(path, text)
+
+        if isinstance(result, str):  # If the result is a string, return it
+            return result
+
         return "File written to successfully."
     except Exception as err:
         return f"Error: {err}"
+    finally:
+        log_operation("write", filename, agent, checksum)
 
 
 @sanitize_path_arg("filename")
@@ -295,28 +335,3 @@ def list_files(directory: str, agent: Agent) -> list[str]:
             found_files.append(relative_path)
 
     return found_files
-
-
-@command(
-    "exists",
-    "Efficiently check if a file or path exists",
-    {
-        "entity": {
-            "type": "string",
-            "description": "The name or path of the entity to check for.",
-            "required": True,
-        },
-    },
-)
-@sanitize_path_arg("entity")
-def exists(entity: str | Path, agent: Agent) -> bool:
-    """Efficiently check if a file or path exists.
-
-    Args:
-        entity (str | Path): The file or path to search for
-        agent (Agent): The agent that is executing the command
-
-    Returns:
-        bool: True if the  exists, otherwise False
-    """
-    return Path(entity).exists()

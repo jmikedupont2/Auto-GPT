@@ -172,7 +172,7 @@ class Agent(BaseAgent):
 
     def parse_and_process_response(
         self, llm_response: ChatModelResponse, *args, **kwargs
-    ) -> tuple[CommandName | None, CommandArgs | None, AgentThoughts]:
+    ) -> tuple[list[tuple[CommandName | None, CommandArgs | None]], AgentThoughts]:
         if not llm_response.content:
             raise SyntaxError("Assistant response has no text content")
 
@@ -190,16 +190,16 @@ class Agent(BaseAgent):
                 continue
             assistant_reply_dict = plugin.post_planning(assistant_reply_dict)
 
-        response = None, None, assistant_reply_dict
+        response = (None, None), assistant_reply_dict
 
         # Print Assistant thoughts
         if assistant_reply_dict != {}:
             # Get command name and arguments
             try:
-                command_name, arguments = extract_command(
+                commands = extract_commands(
                     assistant_reply_dict, llm_response, self.config
                 )
-                response = command_name, arguments, assistant_reply_dict
+                response = commands, assistant_reply_dict
             except Exception as e:
                 logger.error("Error: \n", str(e))
 
@@ -213,9 +213,9 @@ class Agent(BaseAgent):
         return response
 
 
-def extract_command(
+def extract_commands(
     assistant_reply_json: dict, assistant_reply: ChatModelResponse, config: Config
-) -> tuple[str, dict[str, str]]:
+) -> list[tuple[str, dict[str, str]]]:
     """Parse the response and return the command name and arguments
 
     Args:
@@ -239,7 +239,7 @@ def extract_command(
             "args": json.loads(assistant_reply.function_call.arguments),
         }
     try:
-        if "command" not in assistant_reply_json:
+        if "commands" not in assistant_reply_json:
             return "Error:", {"message": "Missing 'command' object in JSON"}
 
         if not isinstance(assistant_reply_json, dict):
@@ -250,24 +250,31 @@ def extract_command(
                 },
             )
 
-        command = assistant_reply_json["command"]
-        if not isinstance(command, dict):
-            return "Error:", {"message": "'command' object is not a dictionary"}
+        commands = assistant_reply_json["commands"]
+        if not isinstance(commands, list):
+            return "Error:", {"message": "'commands' object is not a list"}
 
-        if "name" not in command:
-            return "Error:", {"message": "Missing 'name' field in 'command' object"}
+        parsed_commands = []
+        for command in commands:
+            if not isinstance(command, dict):
+                return "Error:", {"message": "'command' object is not a dictionary"}
 
-        command_name = command["name"]
+            if "name" not in command:
+                return "Error:", {"message": "Missing 'name' field in 'command' object"}
 
-        # Use an empty dictionary if 'args' field is not present in 'command' object
-        arguments = command.get("args", {})
+            command_name = command["name"]
 
-        return command_name, arguments
+            # Use an empty dictionary if 'args' field is not present in 'command' object
+            arguments = command.get("args", {})
+
+            parsed_commands.append((command_name, arguments))
+
+        return parsed_commands
     except json.decoder.JSONDecodeError:
-        return "Error:", {"message": "Invalid JSON"}
+        return [("Error:", {"message": "Invalid JSON"})]
     # All other errors, return "Error: + error message"
     except Exception as e:
-        return "Error:", {"message": str(e)}
+        return [("Error:", {"message": str(e)})]
 
 
 def execute_command(

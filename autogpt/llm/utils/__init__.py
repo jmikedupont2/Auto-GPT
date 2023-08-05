@@ -80,6 +80,7 @@ def create_text_completion(
 
     kwargs = {"model": model}
     kwargs.update(config.get_openai_credentials(model))
+    kwargs.update(config.get_openai_extra_headers())
 
     response = iopenai.create_text_completion(
         prompt=prompt,
@@ -150,6 +151,7 @@ def create_chat_completion(
                 return message
 
     chat_completion_kwargs.update(config.get_openai_credentials(model))
+    chat_completion_kwargs.update(config.get_openai_extra_headers())
 
     if functions:
         chat_completion_kwargs["functions"] = [

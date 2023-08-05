@@ -3,7 +3,7 @@ from pathlib import Path
 from autogpt.agents import Agent
 from autogpt.app.main import run_interaction_loop
 from autogpt.commands import COMMAND_CATEGORIES
-from autogpt.config import AIConfig, Config, ConfigBuilder
+from autogpt.config import AIConfig, ConfigBuilder
 from autogpt.memory.vector import get_memory
 from autogpt.models.command_registry import CommandRegistry
 from autogpt.prompts.prompt import DEFAULT_TRIGGERING_PROMPT
@@ -20,7 +20,7 @@ def run_task(task) -> None:
 def bootstrap_agent(task):
     config = ConfigBuilder.build_config_from_env(workdir=PROJECT_DIR)
     config.continuous_mode = False
-    config.temperature = 0
+    config.temperature = 0.2
     config.plain_output = True
     command_registry = CommandRegistry.with_command_modules(COMMAND_CATEGORIES, config)
     config.memory_backend = "no_memory"
