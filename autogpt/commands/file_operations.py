@@ -52,7 +52,7 @@ def operations_from_log(
             continue
         operation, tail = line.split(": ", maxsplit=1)
         operation = operation.strip()
-        if operation in ("write", "append"):
+        if operation in (Operations.WRITE.value, Operations.APPEND.value):
             try:
                 path, checksum = (x.strip() for x in tail.rsplit(" #", maxsplit=1))
             except ValueError:
