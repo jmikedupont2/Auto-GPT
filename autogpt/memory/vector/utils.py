@@ -51,8 +51,11 @@ def get_embedding(
     model = config.embedding_model
     kwargs = {"model": model}
     kwargs.update(config.get_openai_credentials(model))
-    kwargs.update(config.get_openai_extra_headers())
-
+    
+    # Helicone
+    if helicone_headers := config.get_helicone_headers():
+        kwargs['headers'] = kwargs.get('headers', {}).update(helicone_headers)
+        
     logger.debug(
         f"Getting embedding{f's for {len(input)} inputs' if multiple else ''}"
         f" with model '{model}'"

@@ -1,0 +1,20 @@
+constraints: [
+  'If you do not know what to do, always consider your GOALS.',
+  'Always use notepad.txt to remember important info & read it to recall.',
+  'Use shell command if [ -f <file> ]; then echo "File exists"; else echo "File does not exist"; fi to check if a file exists.',
+  'Always provide accurate and complete information with references.',
+  'Immediately deliver complete code, eschewing placeholders like "pass", "TODO", "CSS code goes here", "JavaScript goes here", or promises of future implementation.',
+  'Adhere to superior code style, commenting, documentation, and patterns.',
+  'Exclusively utilize commands listed below, e.g., command_name.'
+]
+resources: [
+  'Your list of GOALS.',
+  'Your notepad.txt.',
+  'Linux terminal access.',
+  'Web-access.',
+  'File i/o.'
+]
+performance_evaluations: [
+  'Be efficient and accurate.',
+  'Work out your tasks in a step-by-step way to be sure you have the right answer.'
+]

@@ -7,6 +7,7 @@ from autogpt.agents import Agent
 from autogpt.app.main import UserFeedback
 from autogpt.commands import COMMAND_CATEGORIES
 from autogpt.config import AIConfig, ConfigBuilder
+from autogpt.config.prompt_config import PromptConfig
 from autogpt.logs import logger
 from autogpt.memory.vector import get_memory
 from autogpt.models.command_registry import CommandRegistry
@@ -83,7 +84,7 @@ def bootstrap_agent(task, continuous_mode) -> Agent:
     config = ConfigBuilder.build_config_from_env(workdir=PROJECT_DIR)
     config.debug_mode = True
     config.continuous_mode = continuous_mode
-    config.temperature = 0.2
+    config.temperature = 0
     config.plain_output = True
     command_registry = CommandRegistry.with_command_modules(COMMAND_CATEGORIES, config)
     config.memory_backend = "no_memory"
@@ -100,5 +101,5 @@ def bootstrap_agent(task, continuous_mode) -> Agent:
         command_registry=command_registry,
         ai_config=ai_config,
         config=config,
-        triggering_prompt=DEFAULT_TRIGGERING_PROMPT,
+        triggering_prompt=PromptConfig(config.prompt_settings_file).triggering_prompt,
     )

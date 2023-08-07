@@ -56,7 +56,7 @@ class Config(SystemSettings, arbitrary_types_allowed=True):
     # Model configuration
     fast_llm: str = "gpt-3.5-turbo"
     smart_llm: str = "gpt-4-0314"
-    temperature: float = 0.2
+    temperature: float = 0
     openai_functions: bool = False
     embedding_model: str = "text-embedding-ada-002"
     browse_spacy_language_model: str = "en_core_web_sm"
@@ -122,7 +122,6 @@ class Config(SystemSettings, arbitrary_types_allowed=True):
     openai_api_base: Optional[str] = None
     openai_api_version: Optional[str] = None
     openai_organization: Optional[str] = None
-    openai_extra_headers: Optional[Dict[str, str]] = None
     use_azure: bool = False
     azure_config_file: Optional[str] = AZURE_CONFIG_FILE
     azure_model_to_deployment_id_map: Optional[Dict[str, str]] = None
@@ -138,6 +137,9 @@ class Config(SystemSettings, arbitrary_types_allowed=True):
     huggingface_api_token: Optional[str] = None
     # Stable Diffusion
     sd_webui_auth: Optional[str] = None
+    # Helicone
+    helicone_api_key: Optional[str] = None
+    helicone_enable_cache: bool = False
 
     @validator("plugins", each_item=True)
     def validate_plugins(cls, p: AutoGPTPluginTemplate | Any):
@@ -168,11 +170,6 @@ class Config(SystemSettings, arbitrary_types_allowed=True):
             azure_credentials = self.get_azure_credentials(model)
             credentials.update(azure_credentials)
         return credentials
-
-    def get_openai_extra_headers(self) -> dict[str, str]:
-        if self.openai_extra_headers:
-            return {"headers": self.openai_extra_headers}
-        return {}
 
     def get_azure_credentials(self, model: str) -> dict[str, str]:
         """Get the kwargs for the Azure API."""
@@ -223,6 +220,15 @@ class Config(SystemSettings, arbitrary_types_allowed=True):
         else:
             kwargs["deployment_id"] = deployment_id
         return kwargs
+    
+    def get_helicone_headers(self) -> dict[str, str]:
+        headers = {}
+        if self.helicone_api_key:
+            headers["Helicone-Auth"] = f"Bearer {self.helicone_api_key}"
+        if self.helicone_enable_cache:
+            headers["Helicone-Cache-Enabled"] = "true"
+        return headers
+        
 
 
 class ConfigBuilder(Configurable[Config]):
@@ -281,6 +287,8 @@ class ConfigBuilder(Configurable[Config]):
                 "PLUGINS_CONFIG_FILE", PLUGINS_CONFIG_FILE
             ),
             "chat_messages_enabled": os.getenv("CHAT_MESSAGES_ENABLED") == "True",
+            "helicone_api_key": os.getenv("HELICONE_API_KEY"),
+            "helicone_enable_cache": os.getenv("HELICONE_ENABLE_CACHE") == "True",
         }
 
         config_dict["disabled_command_categories"] = _safe_split(
@@ -334,12 +342,6 @@ class ConfigBuilder(Configurable[Config]):
         openai_organization = os.getenv("OPENAI_ORGANIZATION")
         if openai_organization is not None:
             config_dict["openai_organization"] = openai_organization
-
-        openai_extra_headers = _safe_split(os.getenv("OPENAI_EXTRA_HEADERS"))
-        if len(openai_extra_headers) > 0:
-            config_dict["openai_extra_headers"] = dict(
-                [header.split(":") for header in openai_extra_headers]
-            )
 
         config_dict_without_none_values = {
             k: v for k, v in config_dict.items() if v is not None

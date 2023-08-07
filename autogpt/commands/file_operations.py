@@ -213,16 +213,11 @@ def ingest_file(
             "description": "The text to write to the file",
             "required": True,
         },
-        "if_exists": {
-            "type": "string",
-            "description": "One of 'overwrite', 'prepend', 'append', 'skip' or 'fail'",
-            "required": True,
-        },
     },
     aliases=["write_file", "create_file"],
 )
 @sanitize_path_arg("filename")
-def write_to_file(filename: str, text: str, if_exists: str, agent: Agent) -> str:
+def write_to_file(filename: str, text: str, agent: Agent) -> str:
     """Write text to a file
 
     Args:
@@ -233,30 +228,9 @@ def write_to_file(filename: str, text: str, if_exists: str, agent: Agent) -> str
     Returns:
         str: A message indicating success or failure
     """
-    ACTIONS = {
-        "overwrite": lambda p, _txt: p.write_text(_txt, encoding="utf-8"),
-        "prepend": lambda p, _txt: p.write_text(_txt + p.read_text(encoding="utf-8")),
-        "append": lambda p, _txt: open(p, "a", encoding="utf-8").write(_txt),
-        "skip": (
-            lambda p, _txt: "File exists, skipping."
-            if p.exists()
-            else p.write_text(_txt, encoding="utf-8")
-        ),
-        "fail": (
-            lambda p, _txt: "Error: File exists, failing."
-            if p.exists()
-            else p.write_text(_txt, encoding="utf-8")
-        ),
-    }
-
     checksum = text_checksum(text)
     if is_duplicate_operation("write", filename, agent, checksum):
         return "Error: File has already been updated."
-
-    path = Path(filename)
-    directory = path.parent
-    os.makedirs(directory, exist_ok=True)
-
     try:
         result = ACTIONS.get(
             if_exists, lambda p, _txt: "Error: Invalid value for 'if_exists'."
@@ -268,8 +242,6 @@ def write_to_file(filename: str, text: str, if_exists: str, agent: Agent) -> str
         return "File written to successfully."
     except Exception as err:
         return f"Error: {err}"
-    finally:
-        log_operation("write", filename, agent, checksum)
 
 
 @sanitize_path_arg("filename")

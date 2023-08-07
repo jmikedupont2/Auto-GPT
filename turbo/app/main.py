@@ -253,13 +253,13 @@ def run_interaction_loop(
         ########
         # Have the agent determine the next action to take.
         with spinner:
-            command_name, command_args, assistant_reply_dict = agent.think()
+            commands, assistant_reply_dict = agent.think()
 
         ###############
         # Update User #
         ###############
-        # Print the assistant's thoughts and the next command to the user.
-        update_user(config, ai_config, command_name, command_args, assistant_reply_dict)
+        # Print the assistant's thoughts and the next commands to the user.
+        update_user(config, ai_config, commands, assistant_reply_dict)
 
         ##################
         # Get user input #
@@ -298,6 +298,7 @@ def run_interaction_loop(
                 exit()
             else:  # user_feedback == UserFeedback.TEXT
                 command_name = "human_feedback"
+                commands = [(command_name, {"text": user_input})]
         else:
             user_input = None
             # First log new-line so user can differentiate sections better in console
@@ -314,21 +315,38 @@ def run_interaction_loop(
         # Decrement the cycle counter first to reduce the likelihood of a SIGINT
         # happening during command execution, setting the cycles remaining to 1,
         # and then having the decrement set it to 0, exiting the application.
-        if command_name != "human_feedback":
+        if commands[0][0] != "human_feedback":
             cycles_remaining -= 1
-        result = agent.execute(command_name, command_args, user_input)
 
-        if result is not None:
-            logger.typewriter_log("SYSTEM: ", Fore.YELLOW, result)
-        else:
-            logger.typewriter_log("SYSTEM: ", Fore.YELLOW, "Unable to execute command")
+        prev_result = None
+        for command_name, command_args in commands:
+            new_command_args = {}
+            for arg in command_args:
+                if prev_result is not None and isinstance(command_args[arg], str):
+                    new_command_args[arg] = command_args[arg].replace(
+                        "<prev_result>", str(prev_result)
+                    )
+                else:
+                    new_command_args[arg] = command_args[arg]
+            user_input = "y"
+            result = agent.execute(command_name, new_command_args, user_input)
+
+            # HACK: Extract the part of result that comes after "returned: "
+            if "returned: " in str(result):
+                prev_result = str(result).split("returned: ")[1]
+
+            if result is not None:
+                logger.typewriter_log("SYSTEM: ", Fore.YELLOW, str(result))
+            else:
+                logger.typewriter_log(
+                    "SYSTEM: ", Fore.YELLOW, "Unable to execute command"
+                )
 
 
 def update_user(
     config: Config,
     ai_config: AIConfig,
-    command_name: CommandName | None,
-    command_args: CommandArgs | None,
+    commands: list[tuple[CommandName | None, CommandArgs | None]],
     assistant_reply_dict: AgentThoughts,
 ) -> None:
     """Prints the assistant's thoughts and the next command to the user.
@@ -343,32 +361,37 @@ def update_user(
 
     print_assistant_thoughts(ai_config.ai_name, assistant_reply_dict, config)
 
-    if command_name is not None:
-        if command_name.lower().startswith("error"):
-            logger.typewriter_log(
-                "ERROR: ",
-                Fore.RED,
-                f"The Agent failed to select an action. "
-                f"Error message: {command_name}",
-            )
-        else:
-            if config.speak_mode:
-                say_text(f"I want to execute {command_name}", config)
-
-            # First log new-line so user can differentiate sections better in console
-            logger.typewriter_log("\n")
-            logger.typewriter_log(
-                "NEXT ACTION: ",
-                Fore.CYAN,
-                f"COMMAND = {Fore.CYAN}{remove_ansi_escape(command_name)}{Style.RESET_ALL}  "
-                f"ARGUMENTS = {Fore.CYAN}{command_args}{Style.RESET_ALL}",
-            )
-    else:
+    if cmd_count := len(commands):
+        # First log new-line so user can differentiate sections better in console
+        logger.typewriter_log("\n")
         logger.typewriter_log(
-            "NO ACTION SELECTED: ",
-            Fore.RED,
-            f"The Agent failed to select an action.",
+            f"{cmd_count} ACTION{'S' if cmd_count > 1 else ''} SELECTED: ", Fore.CYAN
         )
+        logger.typewriter_log("================================", Fore.CYAN)
+        for i, (command_name, command_args) in enumerate(commands, 1):
+            if command_name is not None:
+                if command_name.lower().startswith("error"):
+                    logger.typewriter_log(
+                        f" [{i}] - ERROR: ",
+                        Fore.RED,
+                        f"The Agent failed to select an action. "
+                        f"Error message: {command_name}",
+                    )
+                else:
+                    if config.speak_mode:
+                        say_text(f"I want to execute {command_name}", config)
+                    logger.typewriter_log(
+                        f" [{i}] - ",
+                        Fore.CYAN,
+                        f"COMMAND = {Fore.CYAN}{remove_ansi_escape(command_name)}{Style.RESET_ALL}  "
+                        f"ARGUMENTS = {Fore.CYAN}{command_args}{Style.RESET_ALL}",
+                    )
+            else:
+                logger.typewriter_log(
+                    f" [{i}] - NO ACTION SELECTED: ",
+                    Fore.RED,
+                    f"The Agent failed to select an action.",
+                )
 
 
 def get_user_feedback(

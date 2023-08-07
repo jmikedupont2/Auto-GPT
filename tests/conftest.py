@@ -8,6 +8,7 @@ from pytest_mock import MockerFixture
 
 from autogpt.agents import Agent
 from autogpt.config import AIConfig, Config, ConfigBuilder
+from autogpt.config.prompt_config import PromptConfig
 from autogpt.llm.api_manager import ApiManager
 from autogpt.logs import logger
 from autogpt.memory.vector import get_memory
@@ -104,5 +105,5 @@ def agent(config: Config) -> Agent:
         command_registry=command_registry,
         ai_config=ai_config,
         config=config,
-        triggering_prompt=DEFAULT_TRIGGERING_PROMPT,
+        triggering_prompt=PromptConfig(config.prompt_settings_file).triggering_prompt,
     )

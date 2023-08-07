@@ -87,6 +87,22 @@ import click
     multiple=True,
     help="AI goal override; may be used multiple times to pass multiple goals",
 )
+@click.option(
+    "--ai",
+    type=str,
+    help="Load a preset AI profile",
+)
+@click.option(
+    "--ai-prompts",
+    type=str,
+    help="Load preset AI profile prompts, not name, role, or goals",
+)
+@click.option(
+    "--ai-list",
+    "--list-ai",
+    is_flag=True,
+    help="List available AI profiles",
+)
 @click.pass_context
 def main(
     ctx: click.Context,
@@ -108,6 +124,9 @@ def main(
     ai_name: Optional[str],
     ai_role: Optional[str],
     ai_goal: tuple[str],
+    ai: Optional[str],
+    ai_prompts: Optional[str],
+    ai_list: bool,
 ) -> None:
     """
     Welcome to AutoGPT an experimental open-source application showcasing the capabilities of the GPT-4 pushing the boundaries of AI.
@@ -116,7 +135,26 @@ def main(
     """
     # Put imports inside function to avoid importing everything when starting the CLI
     from autogpt.app.main import run_auto_gpt
+    from turbo.profiles import ProfileManager
 
+    if ai_list:
+        ProfileManager.list_profiles()
+        return
+    
+    if ai:
+        ai_settings, prompt_settings = ProfileManager.load_profile(ai)
+        ai_name = ai_role = ai_goal = None
+        skip_reprompt = True
+        skip_news = True
+    
+    if ai_prompts:
+        prompt_settings = ProfileManager.load_profile_prompts(ai_prompts)
+        skip_news = True
+        
+    # Default to turbo prompts
+    if not (ai or ai_prompts or prompt_settings):
+        prompt_settings = ProfileManager.load_profile_prompts("turbo")
+    
     if ctx.invoked_subcommand is None:
         run_auto_gpt(
             continuous=continuous,

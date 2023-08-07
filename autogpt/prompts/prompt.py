@@ -3,10 +3,9 @@ from autogpt.config.prompt_config import PromptConfig
 from autogpt.prompts.generator import PromptGenerator
 
 DEFAULT_TRIGGERING_PROMPT = (
-    "1. Using available commands, work out all remaining steps to accomplish your goals, accounting for progress made so far. "
-    "2. Consider whether consecutive commands can be executed at once. You can use '<prev_result>' to pass command outputs to the next command. "
-    "3. Respond with the best list of commands to use. The list must have at least one command. Execution results shall be returned to you. "
-    "4. Your response MUST use the JSON schema specified previously:"
+    "Determine exactly one command to use based on the given goals "
+    "and the progress you have made so far, "
+    "and respond using the JSON schema specified previously:"
 )
 
 

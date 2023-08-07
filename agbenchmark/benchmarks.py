@@ -1,19 +1,18 @@
-import atexit
+import os
 import sys
-import time
 from pathlib import Path
 from typing import Tuple
-
-import yappi
 
 from autogpt.agents import Agent
 from autogpt.app.main import run_interaction_loop
 from autogpt.commands import COMMAND_CATEGORIES
 from autogpt.config import AIConfig, ConfigBuilder
+from autogpt.config.prompt_config import PromptConfig
 from autogpt.memory.vector import get_memory
 from autogpt.models.command_registry import CommandRegistry
 from autogpt.prompts.prompt import DEFAULT_TRIGGERING_PROMPT
 from autogpt.workspace import Workspace
+from turbo.profiler.profiler import start_profiler
 
 PROJECT_DIR = Path().resolve()
 
@@ -34,8 +33,8 @@ def bootstrap_agent(task, continuous_mode) -> Agent:
     config.workspace_path = Workspace.init_workspace_directory(config)
     config.file_logger_path = Workspace.build_file_logger_path(config.workspace_path)
     ai_config = AIConfig(
-        ai_name="Auto-GPT",
-        ai_role="a multi-purpose AI assistant.",
+        ai_name="Auto-GPT-Turbo",
+        ai_role="a multi-purpose AI assistant that autonomously achieves its GOALS",
         ai_goals=[task],
     )
     ai_config.command_registry = command_registry
@@ -44,25 +43,16 @@ def bootstrap_agent(task, continuous_mode) -> Agent:
         command_registry=command_registry,
         ai_config=ai_config,
         config=config,
-        triggering_prompt=DEFAULT_TRIGGERING_PROMPT,
-    )
-
-
-def before_exit():
-    current_timestamp = int(time.time())
-    yappi.stop()
-    yappi.get_func_stats().save(
-        f"./logs/func_wall_stats_{current_timestamp}.profile", type="pstat"
+        triggering_prompt=PromptConfig(config.prompt_settings_file).triggering_prompt,
     )
 
 
 if __name__ == "__main__":
+    start_profiler()
+    
     # The first argument is the script name itself, second is the task
     if len(sys.argv) != 2:
         print("Usage: python script.py <task>")
         sys.exit(1)
     task = sys.argv[1]
-    atexit.register(before_exit)
-    yappi.set_clock_type("wall")
-    yappi.start()
     run_specific_agent(task, continuous_mode=True)

@@ -35,6 +35,7 @@ agbenchmark
 agent-protocol>=0.1.1
 inputimeout
 sarge
+yappi
 
 # web server
 fastapi

@@ -4,6 +4,7 @@ from autogpt.agents import Agent
 from autogpt.app.main import run_interaction_loop
 from autogpt.commands import COMMAND_CATEGORIES
 from autogpt.config import AIConfig, ConfigBuilder
+from autogpt.config.prompt_config import PromptConfig
 from autogpt.memory.vector import get_memory
 from autogpt.models.command_registry import CommandRegistry
 from autogpt.prompts.prompt import DEFAULT_TRIGGERING_PROMPT
@@ -20,15 +21,15 @@ def run_task(task) -> None:
 def bootstrap_agent(task):
     config = ConfigBuilder.build_config_from_env(workdir=PROJECT_DIR)
     config.continuous_mode = False
-    config.temperature = 0.2
+    config.temperature = 0
     config.plain_output = True
     command_registry = CommandRegistry.with_command_modules(COMMAND_CATEGORIES, config)
     config.memory_backend = "no_memory"
     config.workspace_path = Workspace.init_workspace_directory(config)
     config.file_logger_path = Workspace.build_file_logger_path(config.workspace_path)
     ai_config = AIConfig(
-        ai_name="Auto-GPT",
-        ai_role="a multi-purpose AI assistant.",
+        ai_name="Auto-GPT-Turbo",
+        ai_role="a multi-purpose AI assistant that autonomously achieves its GOALS",
         ai_goals=[task.user_input],
     )
     ai_config.command_registry = command_registry
@@ -37,5 +38,5 @@ def bootstrap_agent(task):
         command_registry=command_registry,
         ai_config=ai_config,
         config=config,
-        triggering_prompt=DEFAULT_TRIGGERING_PROMPT,
+        triggering_prompt=PromptConfig(config.prompt_settings_file).triggering_prompt,
     )

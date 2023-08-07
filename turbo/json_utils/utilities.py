@@ -9,7 +9,7 @@ from jsonschema import Draft7Validator
 from autogpt.config import Config
 from autogpt.logs import logger
 
-LLM_DEFAULT_RESPONSE_FORMAT = "llm_response_format_1"
+LLM_DEFAULT_RESPONSE_FORMAT = "llm_response_format_2"
 
 
 def extract_dict_from_response(response_content: str) -> dict[str, Any]:
@@ -38,8 +38,8 @@ def llm_response_schema(
         except Exception as e:
             raise RuntimeError(f"Failed to load JSON schema: {e}")
     if config.openai_functions:
-        del json_schema["properties"]["command"]
-        json_schema["required"].remove("command")
+        del json_schema["properties"]["commands"]
+        json_schema["required"].remove("commands")
     return json_schema
 
 

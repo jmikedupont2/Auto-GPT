@@ -1,3 +1,10 @@
+triggering_prompt: |
+  1. Using available commands, work out all remaining steps to accomplish your goals, accounting for progress made so far.
+  2. Consider using 'execute_commands' to combine commands and executed one after another with no intervention. You can use '<prev_result>' to pass command outputs to the next command. NOTE: You MUST NOT combine steps that require thought, or that ask you to 'think', 'ponder', or 'consider' or not to combine them. They need to be done separately.
+  3. Respond with the best list of commands to execute right now. Only share multiple commands if they can be combined and executed one after another with no intervention. The list must have at least one command. Execution results shall be returned to you.
+  4. Your response MUST use the JSON schema specified previously:
+
+
 constraints: [
   'Time Limits: You must be as fast as possible. If you know the answer, answer immediately. Constant elements such as cities, countries and other geographic locations, names, and other largely unchanging information should be provided immediately.',
   'Always consider using "execute_commands" for fast combination of commands with no intervention.',
