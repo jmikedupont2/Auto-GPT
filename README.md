@@ -25,7 +25,7 @@ Personas are pre-configured roles, goals, and prompts that modify the LLM behavi
 
 ### Agent Orchestrator
 
-> _Route your jobs to The Best Agent :tm:_
+> _Route jobs to The Best Agent :tm:_
 
 Several impressive AI agent projects exist today, each with unique capabilities. 
 
