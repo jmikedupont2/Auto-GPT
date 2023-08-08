@@ -22,7 +22,7 @@ class PromptConfig:
 
     def __init__(self, prompt_settings_file: str) -> None:
         """
-        Initialize a class instance with parameters (constraints, resources, performance_evaluations, triggering_prompt) 
+        Initialize a class instance with parameters (constraints, resources, performance_evaluations, triggering_prompt)
         loaded from the yaml file if yaml file exists, else raises error.
 
         Parameters:
@@ -31,7 +31,7 @@ class PromptConfig:
             None
         """
         from autogpt.prompts.prompt import DEFAULT_TRIGGERING_PROMPT
-        
+
         # Validate file
         (validated, message) = utils.validate_yaml_file(prompt_settings_file)
         if not validated:

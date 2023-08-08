@@ -201,7 +201,7 @@ def ingest_file(
 
 @command(
     "write_to_file",
-    "Writes to a file. if_exists: prepend, append, overwrite, skip or fail.",
+    "Writes to a file",
     {
         "filename": {
             "type": "string",
@@ -223,7 +223,6 @@ def write_to_file(filename: str, text: str, agent: Agent) -> str:
     Args:
         filename (str): The name of the file to write to
         text (str): The text to write to the file
-        if_exists (str): One of 'overwrite', 'prepend', 'append', 'skip' or 'fail'
 
     Returns:
         str: A message indicating success or failure
@@ -232,13 +231,11 @@ def write_to_file(filename: str, text: str, agent: Agent) -> str:
     if is_duplicate_operation("write", filename, agent, checksum):
         return "Error: File has already been updated."
     try:
-        result = ACTIONS.get(
-            if_exists, lambda p, _txt: "Error: Invalid value for 'if_exists'."
-        )(path, text)
-
-        if isinstance(result, str):  # If the result is a string, return it
-            return result
-
+        directory = os.path.dirname(filename)
+        os.makedirs(directory, exist_ok=True)
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write(text)
+        log_operation("write", filename, agent, checksum)
         return "File written to successfully."
     except Exception as err:
         return f"Error: {err}"

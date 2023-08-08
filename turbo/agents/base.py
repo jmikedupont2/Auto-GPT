@@ -22,9 +22,9 @@ AgentThoughts = dict[str, Any]
 
 from autogpt.agents.base import BaseAgent
 
-class TurboBaseAgent(BaseAgent, metaclass=ABCMeta):
-    """ Auto-GPT agents."""
 
+class TurboBaseAgent(BaseAgent, metaclass=ABCMeta):
+    """Auto-GPT agents."""
 
     def think(
         self,

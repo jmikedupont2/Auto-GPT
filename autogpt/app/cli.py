@@ -85,23 +85,22 @@ import click
     "--ai-goal",
     type=str,
     multiple=True,
-    help="AI goal override; may be used multiple times to pass multiple goals",
+    help="AI goal override; may be used multiple times to pass multiple goals.",
 )
 @click.option(
-    "--ai",
+    "--persona",
     type=str,
-    help="Load a preset AI profile",
+    help="Load a preset AI Persona.",
 )
 @click.option(
-    "--ai-prompts",
+    "--inherit-persona",
     type=str,
-    help="Load preset AI profile prompts, not name, role, or goals",
+    help="Load preset AI Persona characteristics (prompt settings), while enabling you to set your own AI name, role, and goals.",
 )
 @click.option(
-    "--ai-list",
-    "--list-ai",
+    "--personas",
     is_flag=True,
-    help="List available AI profiles",
+    help="List available preset AI Personas.",
 )
 @click.pass_context
 def main(
@@ -124,9 +123,9 @@ def main(
     ai_name: Optional[str],
     ai_role: Optional[str],
     ai_goal: tuple[str],
-    ai: Optional[str],
-    ai_prompts: Optional[str],
-    ai_list: bool,
+    persona: Optional[str],
+    inherit_persona: Optional[str],
+    personas: bool,
 ) -> None:
     """
     Welcome to AutoGPT an experimental open-source application showcasing the capabilities of the GPT-4 pushing the boundaries of AI.
@@ -135,26 +134,26 @@ def main(
     """
     # Put imports inside function to avoid importing everything when starting the CLI
     from autogpt.app.main import run_auto_gpt
-    from turbo.profiles import ProfileManager
+    from turbo.personas import PersonaManager
 
-    if ai_list:
-        ProfileManager.list_profiles()
+    if personas:
+        PersonaManager.list()
         return
-    
-    if ai:
-        ai_settings, prompt_settings = ProfileManager.load_profile(ai)
+
+    if persona:
+        ai_settings, prompt_settings = PersonaManager.load(persona)
         ai_name = ai_role = ai_goal = None
         skip_reprompt = True
         skip_news = True
-    
-    if ai_prompts:
-        prompt_settings = ProfileManager.load_profile_prompts(ai_prompts)
+
+    if inherit_persona:
+        prompt_settings = PersonaManager.load_prompts(inherit_persona)
         skip_news = True
-        
+
     # Default to turbo prompts
-    if not (ai or ai_prompts or prompt_settings):
-        prompt_settings = ProfileManager.load_profile_prompts("turbo")
-    
+    if not (persona or inherit_persona or prompt_settings):
+        prompt_settings = PersonaManager.load_prompts("turbo")
+
     if ctx.invoked_subcommand is None:
         run_auto_gpt(
             continuous=continuous,

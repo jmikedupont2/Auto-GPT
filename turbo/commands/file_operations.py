@@ -9,6 +9,7 @@ COMMAND_CATEGORY_TITLE = "File Operations"
 from autogpt.agents.agent import Agent
 from autogpt.command_decorator import command
 
+
 @command(
     "write_to_file",
     "Writes to a file. if_exists: prepend, append, overwrite, skip or fail.",

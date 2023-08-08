@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from autogpt.memory.vector import VectorMemory
     from autogpt.models.command_registry import CommandRegistry
 
+from autogpt.agents.agent import Agent
 from autogpt.json_utils.utilities import extract_dict_from_response, validate_dict
 from autogpt.llm.api_manager import ApiManager
 from autogpt.llm.base import Message
@@ -25,8 +26,8 @@ from autogpt.logs.log_cycle import (
 )
 from autogpt.workspace import Workspace
 
-from autogpt.agents.agent import Agent
-from .base import TurboBaseAgent, CommandName
+from .base import CommandName, TurboBaseAgent
+
 
 class TurboAgent(Agent, TurboBaseAgent):
     """Auto-GPT Turbo Agent."""

@@ -145,7 +145,10 @@ class Workspace:
 
     @staticmethod
     def build_file_logger_path(workspace_directory: Path) -> Path:
-        file_logger_path = workspace_directory / "file_logger.txt"
+        # file_logger_path = workspace_directory / "file_logger.txt"
+        # Do not mess up the workspace with unwanted files (benchmarks)
+        # TODO: Turn this into a config option, and use platformdirs
+        file_logger_path = Path(__file__).parent.parent.parent / "logs" / "file_logger.txt"
         if not file_logger_path.exists():
             with file_logger_path.open(mode="w", encoding="utf-8") as f:
                 f.write("File Operation Logger ")
