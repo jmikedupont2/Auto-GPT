@@ -15,7 +15,7 @@ What we're testing ...
 
 > _Customized AI roles, goals & settings for instant execution_
 
-- turbo - Our default persona. Enhanced for speed with one-shot responses and batch command execution.
+- turbo - The default. Enhanced for speed with one-shot responses and batch command execution.
 - codezilla.planner - Transform a simple idea into a development plan - complete with requirements and data structures.
 - codezilla.engineer - Evolve your development plan into a fully-integrated codebase.
 - kerouac - Unleash your literary instincts and write like a seasoned novelist.
