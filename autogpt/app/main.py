@@ -29,7 +29,6 @@ from autogpt.logs import logger
 from autogpt.memory.vector import get_memory
 from autogpt.models.command_registry import CommandRegistry
 from autogpt.plugins import scan_plugins
-from autogpt.prompts.prompt import DEFAULT_TRIGGERING_PROMPT
 from autogpt.speech import say_text
 from autogpt.workspace import Workspace
 from scripts.install_plugin_deps import install_plugin_dependencies
@@ -54,8 +53,8 @@ def run_auto_gpt(
     install_plugin_deps: bool,
     ai_name: Optional[str] = None,
     ai_role: Optional[str] = None,
-    ai_goals: tuple[str] = tuple(),
-):
+    ai_goals: Optional[tuple[str]] = None,
+) -> None:
     # Configure logging before we do anything else.
     logger.set_level(logging.DEBUG if debug else logging.INFO)
 
@@ -175,7 +174,7 @@ def run_auto_gpt(
     run_interaction_loop(agent)
 
 
-def _get_cycle_budget(continuous_mode: bool, continuous_limit: int) -> int | None:
+def _get_cycle_budget(continuous_mode: bool, continuous_limit: int) -> float | int:
     # Translate from the continuous_mode/continuous_limit config
     # to a cycle_budget (maximum number of cycles to run without checking in with the
     # user) and a count of cycles_remaining before we check in..
@@ -245,7 +244,7 @@ def run_interaction_loop(
     # Application Main Loop #
     #########################
 
-    while cycles_remaining > 0:
+    while cycles_remaining and cycles_remaining > 0:
         logger.debug(f"Cycle budget: {cycle_budget}; remaining: {cycles_remaining}")
 
         ########
@@ -436,7 +435,7 @@ def construct_main_ai_config(
     config: Config,
     name: Optional[str] = None,
     role: Optional[str] = None,
-    goals: tuple[str] = tuple(),
+    goals: Optional[tuple[str]] = None,
 ) -> AIConfig:
     """Construct the prompt for the AI to respond to
 

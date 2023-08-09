@@ -2,6 +2,8 @@
 
 Turbo is the high-octane testing ground for experimental Auto-GPT features. Will these next-gen innovations race into Auto-GPT's lineup or get left in the dust?
 
+[Setup Auto-GPT-Turbo](/turbo/docs/setup.md) | [Personas](/turbo/docs/personas.md) 
+
 ## Revving Up Performance
 - In gear with the latest stable Auto-GPT (v0.4.7)
 - Precision-tuned with Auto-GPT-Benchmarks [link]
@@ -22,6 +24,8 @@ What we're testing ...
 - madison - A haven for creativity and innovation.
 
 Personas are pre-configured roles, goals, and prompts that modify the LLM behavior. You can elevate your productivity with the packaged Personas or change them to create your own. The roadmap includes task-level auto-selection, goal-level persona switching, and the ability to save and share personas.
+
+See [Personas](/turbo/docs/personas.md) for more details.
 
 ### Agent Orchestrator
 

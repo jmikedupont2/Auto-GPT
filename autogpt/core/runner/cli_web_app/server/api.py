@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 from agent_protocol import StepHandler, StepResult
 from colorama import Fore
@@ -11,20 +12,19 @@ from autogpt.config.prompt_config import PromptConfig
 from autogpt.logs import logger
 from autogpt.memory.vector import get_memory
 from autogpt.models.command_registry import CommandRegistry
-from autogpt.prompts.prompt import DEFAULT_TRIGGERING_PROMPT
 from autogpt.workspace import Workspace
 
 PROJECT_DIR = Path().resolve()
 
 
-async def task_handler(task_input) -> StepHandler:
+async def task_handler(task_input: Any) -> StepHandler:
     task = task_input.__root__ if task_input else {}
     agent = bootstrap_agent(task.get("user_input"), False)
 
     next_command_name: str | None = None
     next_command_args: dict[str, str] | None = None
 
-    async def step_handler(step_input) -> StepResult:
+    async def step_handler(step_input: Any) -> StepResult:
         step = step_input.__root__ if step_input else {}
 
         nonlocal next_command_name, next_command_args
@@ -49,14 +49,14 @@ async def task_handler(task_input) -> StepHandler:
 
 async def interaction_step(
     agent: Agent,
-    user_input,
+    user_input: str,
     user_feedback: UserFeedback | None,
     command_name: str | None,
     command_args: dict[str, str] | None,
-):
+) -> dict[str, Any] | None:
     """Run one step of the interaction loop."""
     if user_feedback == UserFeedback.EXIT:
-        return
+        return None
     if user_feedback == UserFeedback.TEXT:
         command_name = "human_feedback"
 
@@ -66,7 +66,7 @@ async def interaction_step(
         result = agent.execute(command_name, command_args, user_input)
         if result is None:
             logger.typewriter_log("SYSTEM: ", Fore.YELLOW, "Unable to execute command")
-            return
+            return None
 
     next_command_name, next_command_args, assistant_reply_dict = agent.think()
 
@@ -80,7 +80,7 @@ async def interaction_step(
     }
 
 
-def bootstrap_agent(task, continuous_mode) -> Agent:
+def bootstrap_agent(task: str, continuous_mode: int) -> Agent:
     config = ConfigBuilder.build_config_from_env(workdir=PROJECT_DIR)
     config.debug_mode = True
     config.continuous_mode = continuous_mode

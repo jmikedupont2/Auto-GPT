@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Generator
 
 import pytest
 import yaml
@@ -13,7 +14,6 @@ from autogpt.llm.api_manager import ApiManager
 from autogpt.logs import logger
 from autogpt.memory.vector import get_memory
 from autogpt.models.command_registry import CommandRegistry
-from autogpt.prompts.prompt import DEFAULT_TRIGGERING_PROMPT
 from autogpt.workspace import Workspace
 
 pytest_plugins = [
@@ -35,7 +35,7 @@ def workspace(workspace_root: Path) -> Workspace:
 
 
 @pytest.fixture
-def temp_plugins_config_file():
+def temp_plugins_config_file() -> Generator:
     """Create a plugins_config.yaml file in a temp directory so that it doesn't mess with existing ones"""
     config_directory = TemporaryDirectory()
     config_file = os.path.join(config_directory.name, "plugins_config.yaml")
