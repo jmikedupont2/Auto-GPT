@@ -4,16 +4,19 @@ from colorama import Fore
 
 from autogpt.logs import logger
 
+SETTINGS_FILE = "ai.yaml"
+PROMPTS_FILE = "prompts.yaml"
+
 
 class PersonaManager:
     _personas = None
 
     @classmethod
-    def get_all(cls):
+    def get_all(cls) -> list[str]:
         if cls._personas is None:
             my_dir = Path(__file__).parent
-            ai_files = my_dir.glob("**/ai_settings.json")
-            prompt_files = my_dir.glob("**/prompt_settings.yaml")
+            ai_files = my_dir.glob(f"**/{SETTINGS_FILE}")
+            prompt_files = my_dir.glob(f"**/{PROMPTS_FILE}")
             dirs = set(
                 [file.parent.relative_to(my_dir) for file in ai_files]
                 + [file.parent.relative_to(my_dir) for file in prompt_files]
@@ -22,7 +25,7 @@ class PersonaManager:
         return cls._personas
 
     @classmethod
-    def list(cls):
+    def list(cls) -> None:
         personas = cls.get_all()
         count = len(personas)
 
@@ -36,7 +39,7 @@ class PersonaManager:
             logger.typewriter_log(f"  [{i}] - {persona}", Fore.CYAN)
 
     @classmethod
-    def validate(cls, persona_name):
+    def validate(cls, persona_name: str) -> bool:
         if persona_name not in cls.get_all():
             logger.typewriter_log(
                 f"Profile '{persona_name}' not found. Use '--personas' to see available personas.",
@@ -46,37 +49,33 @@ class PersonaManager:
         return True
 
     @classmethod
-    def load(cls, persona_name):
+    def load(cls, persona_name: str) -> tuple[str | None, str | None]:
         if cls.validate(persona_name):
             ai_settings_file = (
-                Path(__file__).parent
-                / persona_name.replace(".", "/")
-                / "ai_settings.yaml"
+                Path(__file__).parent / persona_name.replace(".", "/") / SETTINGS_FILE
             )
 
             if ai_settings_file.exists():
-                ai_settings_file = str(ai_settings_file)
+                ai_settings = str(ai_settings_file)
                 logger.typewriter_log(
                     f"Loading ai settings persona for '{persona_name}'.", Fore.CYAN
                 )
             else:
-                ai_settings_file = None
+                ai_settings = None
                 logger.typewriter_log(
                     f"Persona '{persona_name}' does not have ai settings.",
                     Fore.YELLOW,
                 )
 
-            prompt_settings_file = cls.load_prompts(persona_name)
-            return ai_settings_file, prompt_settings_file
-        return None
+            prompt_settings = cls.load_prompts(persona_name)
+            return ai_settings, prompt_settings
+        return None, None
 
     @classmethod
-    def load_prompts(cls, persona_name):
+    def load_prompts(cls, persona_name: str) -> None | str:
         if cls.validate(persona_name):
             prompt_settings_file = (
-                Path(__file__).parent
-                / persona_name.replace(".", "/")
-                / "prompt_settings.yaml"
+                Path(__file__).parent / persona_name.replace(".", "/") / PROMPTS_FILE
             )
             if prompt_settings_file.exists():
                 logger.typewriter_log(
