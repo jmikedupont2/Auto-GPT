@@ -2,7 +2,7 @@
 
 Turbo is the high-octane testing ground for experimental Auto-GPT features. Will these next-gen innovations race into Auto-GPT's lineup or get left in the dust?
 
-[Setup Auto-GPT-Turbo](/turbo/docs/setup.md) | [Personas](/turbo/docs/personas.md) 
+[ [Setup Auto-GPT-Turbo](/turbo/docs/setup.md) | [Personas](/turbo/docs/personas.md) ]
 
 ## Revving Up Performance
 - In gear with the latest stable Auto-GPT (v0.4.7)
