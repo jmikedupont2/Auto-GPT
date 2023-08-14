@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from autogpt.commands.decorators import sanitize_path_arg
 
 COMMAND_CATEGORY = "file_operations"
 COMMAND_CATEGORY_TITLE = "File Operations"
