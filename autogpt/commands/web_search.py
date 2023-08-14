@@ -18,18 +18,18 @@ DUCKDUCKGO_MAX_ATTEMPTS = 3
 
 
 @command(
-    "web_search",
+    "ws",
     "Searches the web",
     {
-        "query": {
+        "q": {
             "type": "string",
             "description": "The search query",
             "required": True,
         }
     },
-    aliases=["search"],
+    aliases=["web_search", "search"],
 )
-def web_search(query: str, agent: Agent, num_results: int = 8) -> str:
+def web_search(q: str, agent: Agent, num_results: int = 8) -> str:
     """Return the results of a Google search
 
     Args:
@@ -43,10 +43,10 @@ def web_search(query: str, agent: Agent, num_results: int = 8) -> str:
     attempts = 0
 
     while attempts < DUCKDUCKGO_MAX_ATTEMPTS:
-        if not query:
+        if not q:
             return json.dumps(search_results)
 
-        results = DDGS().text(query)
+        results = DDGS().text(q)
         search_results = list(islice(results, num_results))
 
         if search_results:

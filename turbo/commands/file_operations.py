@@ -2,7 +2,14 @@
 
 from __future__ import annotations
 
+import os
+
 from autogpt.commands.decorators import sanitize_path_arg
+from autogpt.commands.file_operations import (
+    is_duplicate_operation,
+    log_operation,
+    text_checksum,
+)
 
 COMMAND_CATEGORY = "file_operations"
 COMMAND_CATEGORY_TITLE = "File Operations"
@@ -33,7 +40,7 @@ from autogpt.command_decorator import command
     aliases=["write_file", "create_file"],
 )
 @sanitize_path_arg("filename")
-def write_to_file(filename: str, text: str, if_exists: str, agent: Agent) -> str:
+def write_to_file_new(filename: str, text: str, if_exists: str, agent: Agent) -> str:
     """Write text to a file
 
     Args:

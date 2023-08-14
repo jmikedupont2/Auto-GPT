@@ -60,7 +60,7 @@ class Agent(BaseAgent):
         self.log_cycle_handler = LogCycleHandler()
         """LogCycleHandler for structured debug logging."""
 
-    def construct_base_prompt(self, *args, **kwargs) -> ChatSequence:
+    def construct_base_prompt(self, *args: Any, **kwargs: Any) -> ChatSequence:
         if kwargs.get("prepend_messages") is None:
             kwargs["prepend_messages"] = []
 
@@ -99,7 +99,7 @@ class Agent(BaseAgent):
 
         return super().construct_base_prompt(*args, **kwargs)
 
-    def on_before_think(self, *args, **kwargs) -> ChatSequence:
+    def on_before_think(self, *args: Any, **kwargs: Any) -> ChatSequence:
         prompt = super().on_before_think(*args, **kwargs)
 
         self.log_cycle_handler.log_count_within_cycle = 0
@@ -171,7 +171,7 @@ class Agent(BaseAgent):
         return result
 
     def parse_and_process_response(
-        self, llm_response: ChatModelResponse, *args, **kwargs
+        self, llm_response: ChatModelResponse, *args: Any, **kwargs: Any
     ) -> tuple[CommandName | None, CommandArgs | None, AgentThoughts]:
         if not llm_response.content:
             raise SyntaxError("Assistant response has no text content")
@@ -234,12 +234,12 @@ def extract_command(
     if config.openai_functions:
         if assistant_reply.function_call is None:
             return "Error:", {"message": "No 'function_call' in assistant reply"}
-        assistant_reply_json["command"] = {
-            "name": assistant_reply.function_call.name,
-            "args": json.loads(assistant_reply.function_call.arguments),
+        assistant_reply_json["cmd"] = {
+            "n": assistant_reply.function_call.name,
+            "a": json.loads(assistant_reply.function_call.arguments),
         }
     try:
-        if "command" not in assistant_reply_json:
+        if "cmd" not in assistant_reply_json:
             return "Error:", {"message": "Missing 'command' object in JSON"}
 
         if not isinstance(assistant_reply_json, dict):
@@ -250,17 +250,17 @@ def extract_command(
                 },
             )
 
-        command = assistant_reply_json["command"]
+        command = assistant_reply_json["cmd"]
         if not isinstance(command, dict):
-            return "Error:", {"message": "'command' object is not a dictionary"}
+            return "Error:", {"message": "'cmd' object is not a dictionary"}
 
-        if "name" not in command:
-            return "Error:", {"message": "Missing 'name' field in 'command' object"}
+        if "n" not in command:
+            return "Error:", {"message": "Missing 'n' field in 'cmd' object"}
 
-        command_name = command["name"]
+        command_name = command["n"]
 
         # Use an empty dictionary if 'args' field is not present in 'command' object
-        arguments = command.get("args", {})
+        arguments = command.get("a", {})
 
         return command_name, arguments
     except json.decoder.JSONDecodeError:

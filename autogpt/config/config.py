@@ -220,7 +220,7 @@ class Config(SystemSettings, arbitrary_types_allowed=True):
         else:
             kwargs["deployment_id"] = deployment_id
         return kwargs
-    
+
     def get_helicone_headers(self) -> dict[str, str]:
         headers = {}
         if self.helicone_api_key:
@@ -228,7 +228,6 @@ class Config(SystemSettings, arbitrary_types_allowed=True):
         if self.helicone_enable_cache:
             headers["Helicone-Cache-Enabled"] = "true"
         return headers
-        
 
 
 class ConfigBuilder(Configurable[Config]):

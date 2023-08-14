@@ -2,44 +2,31 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-        "thoughts": {
+        "thts": {
             "type": "object",
             "properties": {
-                "text": {
+                "t": {
                     "type": "string",
                     "description": "thoughts"
                 },
-                "reasoning": {
-                    "type": "string"
-                },
-                "plan": {
+                "p": {
                     "type": "string",
                     "description": "- short bulleted\n- list that conveys\n- long-term plan"
-                },
-                "criticism": {
-                    "type": "string",
-                    "description": "constructive self-criticism"
-                },
-                "speak": {
-                    "type": "string",
-                    "description": "thoughts summary to say to user"
                 }
             },
-            "required": ["text", "reasoning", "plan", "criticism", "speak"],
+            "required": ["p"],
             "additionalProperties": false
         },
-        "command": {
+        "cmd": {
             "type": "object",
             "properties": {
-                "name": {"type": "string"},
-                "args": {
+                "n": {"t": "string"},
+                "a": {
                     "type": "object"
                 }
             },
-            "required": ["name", "args"],
+            "required": ["n", "a"],
             "additionalProperties": false
         }
-    },
-    "required": ["thoughts", "command"],
-    "additionalProperties": false
+    }
 }

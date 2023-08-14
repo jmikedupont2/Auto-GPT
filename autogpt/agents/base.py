@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Any, Literal, Optional
 
 if TYPE_CHECKING:
     from autogpt.config import AIConfig, Config
-
     from autogpt.models.command_registry import CommandRegistry
 
 from autogpt.llm.base import ChatModelResponse, ChatSequence, Message
@@ -227,25 +226,38 @@ class BaseAgent(metaclass=ABCMeta):
         if thought_process_id != "one-shot":
             raise NotImplementedError(f"Unknown thought process '{thought_process_id}'")
 
-        RESPONSE_FORMAT_WITH_COMMAND = """```ts
-        interface Response {
-            thoughts: {
-                // Thoughts
-                text: string;
-                reasoning: string;
-                // Short markdown-style bullet list that conveys the long-term plan
-                plan: string;
-                // Constructive self-criticism
-                criticism: string;
-                // Summary of thoughts to say to the user
-                speak: string;
-            };
-            command: {
-                name: string;
-                args: Record<string, any>;
-            };
-        }
-        ```"""
+        if self.config.debug_mode:
+            RESPONSE_FORMAT_WITH_COMMAND = """```ts
+            interface Response {
+                thts: {
+                    /* Thoughts & reasoning */
+                    t: string;
+                    /* Long-term plan as short markdown bullet list */
+                    p: string;
+                };
+                cmd: {
+                    /* Command Name */
+                    n: string;
+                    /* Command Args */
+                    a: Record<string, any>;
+                };
+            }
+            ```"""
+        else:
+            RESPONSE_FORMAT_WITH_COMMAND = """```ts
+            interface Response {
+                thts: {
+                    /* Long-term plan as short markdown bullet list */
+                    p: string;
+                };
+                cmd: {
+                    /* Command Name */
+                    n: string;
+                    /* Command Args */
+                    a: Record<string, any>;
+                };
+            }
+            ```"""
 
         RESPONSE_FORMAT_WITHOUT_COMMAND = """```ts
         interface Response {
@@ -265,7 +277,7 @@ class BaseAgent(metaclass=ABCMeta):
 
         response_format = re.sub(
             r"\n\s+",
-            "\n",
+            "",
             RESPONSE_FORMAT_WITHOUT_COMMAND
             if self.config.openai_functions
             else RESPONSE_FORMAT_WITH_COMMAND,
@@ -274,7 +286,7 @@ class BaseAgent(metaclass=ABCMeta):
         use_functions = self.config.openai_functions and self.command_registry.commands
         return (
             f"Respond strictly with JSON{', and also specify a command to use through a function_call' if use_functions else ''}. "
-            "The JSON should be compatible with the TypeScript type `Response` from the following:\n"
+            "The JSON should be compatible with the TypeScript type `Response` from the following, with no newlines:\n"
             f"{response_format}\n"
         )
 

@@ -210,10 +210,10 @@ def validate_command(command: str, config: Config) -> bool:
 
 
 @command(
-    "execute_shell",
+    "sh",
     "Executes a Shell Command, non-interactive commands only",
     {
-        "command_line": {
+        "cmd": {
             "type": "string",
             "description": "The command line to execute",
             "required": True,
@@ -223,9 +223,10 @@ def validate_command(command: str, config: Config) -> bool:
     disabled_reason="You are not allowed to run local shell commands. To execute"
     " shell commands, EXECUTE_LOCAL_COMMANDS must be set to 'True' "
     "in your config file: .env - do not attempt to bypass the restriction.",
+    aliases=["execute_shell", "exec_shell"],
 )
 @run_in_workspace
-def execute_shell(command_line: str, agent: Agent) -> str:
+def execute_shell(cmd: str, agent: Agent) -> str:
     """Execute a shell command and return the output
 
     Args:
@@ -235,15 +236,13 @@ def execute_shell(command_line: str, agent: Agent) -> str:
     Returns:
         str: The output of the command
     """
-    if not validate_command(command_line, agent.config):
-        logger.info(f"Command '{command_line}' not allowed")
+    if not validate_command(cmd, agent.config):
+        logger.info(f"Command '{cmd}' not allowed")
         return "Error: This Shell Command is not allowed."
 
-    logger.info(
-        f"Executing command '{command_line}' in working directory '{os.getcwd()}'"
-    )
+    logger.info(f"Executing command '{cmd}' in working directory '{os.getcwd()}'")
 
-    result = subprocess.run(command_line, capture_output=True, shell=True)
+    result = subprocess.run(cmd, capture_output=True, shell=True)
     output = f"STDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"
     return output
 
@@ -258,8 +257,8 @@ def execute_shell(command_line: str, agent: Agent) -> str:
             "required": True,
         }
     },
-    lambda config: config.execute_local_commands,
-    "You are not allowed to run local shell commands. To execute"
+    enabled=False,  # old: lambda config: config.execute_local_commands,
+    disabled_reason="You are not allowed to run local shell commands. To execute"
     " shell commands, EXECUTE_LOCAL_COMMANDS must be set to 'True' "
     "in your config. Do not attempt to bypass the restriction.",
 )

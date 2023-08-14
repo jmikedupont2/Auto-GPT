@@ -88,21 +88,18 @@ import click
     help="AI goal override; may be used multiple times to pass multiple goals.",
 )
 @click.option(
-    "--persona",
     "--preset",
     "--example",
     type=str,
     help="Load a preset AI config.",
 )
 @click.option(
-    "--inherit-persona",
     "--inherit-preset",
     "--inherit-example",
     type=str,
     help="Load a preset AI config, while enabling you to set your own AI name, role, and goals.",
 )
 @click.option(
-    "--personas",
     "--presets",
     "--examples",
     is_flag=True,

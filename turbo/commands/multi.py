@@ -11,18 +11,18 @@ from autogpt.command_decorator import command
 
 
 @command(
-    "execute_commands",
-    "Efficiently execute many commands. Use <prev_result> to pass command output to the next command.",
+    "docmds",
+    "Efficiently execute many commands (do cmds). Use <prev_result> to pass command output to the next command.",
     {
-        "commands": {
-            "type": "list[{command: str, args: dict[str, object]}]",
-            "description": "A list of commands and their arguments.",
+        "cmds": {
+            "type": "list[{n: str, a: dict[str, object]}]",
+            "description": "A list of command names (n) and their arguments (a).",
             "required": True,
         },
     },
-    aliases=["exec_commands", "execute_commands"],
+    aliases=["exec_commands", "execute_commands", "exc_cmds"],
 )
-def execute_commands(commands, agent: Agent) -> str:
+def execute_commands(cmds: list, agent: Agent) -> str:
     """Execute commands consecutively with no intervention.
 
     Args:
@@ -33,9 +33,9 @@ def execute_commands(commands, agent: Agent) -> str:
     """
     results = []
     prev_result = None
-    for item in commands:
-        command_name = item["command"]
-        command_args = item["args"]
+    for item in cmds:
+        command_name = item["n"]
+        command_args = item["a"]
         new_command_args = {}
         for arg in command_args:
             if prev_result is not None and isinstance(command_args[arg], str):

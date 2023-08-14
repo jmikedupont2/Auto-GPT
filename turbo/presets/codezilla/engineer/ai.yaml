@@ -2,7 +2,7 @@ ai_goals:
 - | 
   Read the spec; 
   Read the task specification from 3_specification.txt, or
-  Clearly let the user know that they need to run 'autogpt --persona codezilla.planner' to generate the specification.
+  Clearly let the user know that they need to run 'autogpt --preset codezilla.planner' to generate the specification.
   Exit if you cannot find the specification.
   Once you know the specification, you will move on to the next step.
 - |

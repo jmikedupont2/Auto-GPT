@@ -140,18 +140,21 @@ def log_operation(
 
 
 @command(
-    "read_file",
+    "rf",
     "Read an existing file",
     {
-        "filename": {
+        "f": {
             "type": "string",
             "description": "The path of the file to read",
             "required": True,
         }
     },
+    aliases=[
+        "read_file",
+    ],
 )
-@sanitize_path_arg("filename")
-def read_file(filename: str, agent: Agent) -> str:
+@sanitize_path_arg("f")
+def read_file(f: str, agent: Agent) -> str:
     """Read a file and return the contents
 
     Args:
@@ -161,10 +164,10 @@ def read_file(filename: str, agent: Agent) -> str:
         str: The contents of the file
     """
     try:
-        content = read_textual_file(filename, logger)
+        content = read_textual_file(f, logger)
 
         # TODO: invalidate/update memory when file is edited
-        file_memory = MemoryItem.from_text_file(content, filename, agent.config)
+        file_memory = MemoryItem.from_text_file(content, f, agent.config)
         if len(file_memory.chunks) > 1:
             return file_memory.summary
 
@@ -200,24 +203,24 @@ def ingest_file(
 
 
 @command(
-    "write_to_file",
-    "Writes to a file",
+    "wf",
+    "Writes to a file, overwriting existing contents.",
     {
-        "filename": {
+        "f": {
             "type": "string",
             "description": "The name of the file to write to",
             "required": True,
         },
-        "text": {
+        "t": {
             "type": "string",
             "description": "The text to write to the file",
             "required": True,
         },
     },
-    aliases=["write_file", "create_file"],
+    aliases=["write_to_file", "write_file", "create_file"],
 )
-@sanitize_path_arg("filename")
-def write_to_file(filename: str, text: str, agent: Agent) -> str:
+@sanitize_path_arg("f")
+def write_to_file(f: str, t: str, agent: Agent) -> str:
     """Write text to a file
 
     Args:
@@ -227,15 +230,15 @@ def write_to_file(filename: str, text: str, agent: Agent) -> str:
     Returns:
         str: A message indicating success or failure
     """
-    checksum = text_checksum(text)
-    if is_duplicate_operation("write", filename, agent, checksum):
+    checksum = text_checksum(t)
+    if is_duplicate_operation("write", f, agent, checksum):
         return "Info: File has already been updated."
     try:
-        directory = os.path.dirname(filename)
+        directory = os.path.dirname(f)
         os.makedirs(directory, exist_ok=True)
-        with open(filename, "w", encoding="utf-8") as f:
-            f.write(text)
-        log_operation("write", filename, agent, checksum)
+        with open(f, "w", encoding="utf-8") as _f:
+            _f.write(t)
+        log_operation("write", f, agent, checksum)
         return "File written to successfully."
     except Exception as err:
         return f"Error: {err}"
