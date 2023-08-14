@@ -169,3 +169,5 @@ package.json
 # Benchmarks
 agbenchmark/reports/*
 agbenchmark/regression_tests.json
+agbenchmark/regression_tests.json
+challenges_already_beaten.json

@@ -1,6 +1,6 @@
 """Text processing functions"""
 from math import ceil
-from typing import Optional
+from typing import Any, Iterable, Optional
 
 import spacy
 import tiktoken
@@ -11,14 +11,17 @@ from autogpt.llm.providers.openai import OPEN_AI_MODELS
 from autogpt.llm.utils import count_string_tokens, create_chat_completion
 from autogpt.logs import logger
 
+TOKENS_TO_TRIGGER_SUMMARY = 50
 
-def batch(iterable, max_batch_length: int, overlap: int = 0):
+
+def batch(iterable: Iterable[Any], max_batch_length: int, overlap: int = 0) -> Iterable:
     """Batch data from iterable into slices of length N. The last batch may be shorter."""
     # batched('ABCDEFG', 3) --> ABC DEF G
     if max_batch_length < 1:
         raise ValueError("n must be at least one")
-    for i in range(0, len(iterable), max_batch_length - overlap):
-        yield iterable[i : i + max_batch_length]
+    iterable_list = list(iterable)
+    for i in range(0, len(iterable_list), max_batch_length - overlap):
+        yield iterable_list[i : i + max_batch_length]
 
 
 def _max_chunk_length(model: str, max: Optional[int] = None) -> int:
@@ -40,8 +43,8 @@ def chunk_content(
     content: str,
     for_model: str,
     max_chunk_length: Optional[int] = None,
-    with_overlap=True,
-):
+    with_overlap: bool = True,
+) -> Iterable[tuple[str, int]]:
     """Split content into chunks of approximately equal token length."""
 
     MAX_OVERLAP = 200  # limit overlap to save tokens
@@ -94,14 +97,18 @@ def summarize_text(
 
     if question:
         instruction = (
-            f'include any information that can be used to answer the question "{question}". '
-            "Do not directly answer the question itself"
+            "If the text contains the answer to the following question, start with the answer, "
+            f"followed by a summary of the supporting text. Question: {question}"
         )
 
     summarization_prompt = ChatSequence.for_model(model)
 
     token_length = count_string_tokens(text, model)
     logger.info(f"Text length: {token_length} tokens")
+
+    if TOKENS_TO_TRIGGER_SUMMARY >= token_length:
+        # No need to summarize
+        return text, None
 
     # reserve 50 tokens for summary prompt, 500 for the response
     max_chunk_length = _max_chunk_length(model) - 550
@@ -154,9 +161,9 @@ def split_text(
     text: str,
     for_model: str,
     config: Config,
-    with_overlap=True,
+    with_overlap: bool = True,
     max_chunk_length: Optional[int] = None,
-):
+) -> Iterable[tuple[str, int]]:
     """Split text into chunks of sentences, with each chunk not exceeding the maximum length
 
     Args:

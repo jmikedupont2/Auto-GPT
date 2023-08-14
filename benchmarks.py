@@ -3,24 +3,24 @@ from pathlib import Path
 from autogpt.agents import Agent
 from autogpt.app.main import construct_main_ai_config, run_interaction_loop
 from autogpt.commands import COMMAND_CATEGORIES
-from autogpt.config import AIConfig, ConfigBuilder
+from autogpt.config import ConfigBuilder
 from autogpt.config.prompt_config import PromptConfig
 from autogpt.memory.vector import get_memory
 from autogpt.models.command_registry import CommandRegistry
-from autogpt.prompts.prompt import DEFAULT_TRIGGERING_PROMPT
 from autogpt.workspace import Workspace
-from turbo.personas.manager import PersonaManager
+from turbo.presets.manager import PresetManager
 
 PROJECT_DIR = Path().resolve()
 
 
-def run_task(task) -> None:
+def run_task(task: str) -> None:
     agent = bootstrap_agent(task)
     run_interaction_loop(agent)
+    return None
 
 
-def bootstrap_agent(task) -> Agent:
-    prompt_settings_file = PersonaManager.load_prompts("turbo")
+def bootstrap_agent(task: str) -> Agent:
+    prompt_settings_file = PresetManager.load_prompts("turbo")
 
     config = ConfigBuilder.build_config_from_env(workdir=PROJECT_DIR)
     config.prompt_settings_file = prompt_settings_file

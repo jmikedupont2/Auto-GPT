@@ -229,7 +229,7 @@ def write_to_file(filename: str, text: str, agent: Agent) -> str:
     """
     checksum = text_checksum(text)
     if is_duplicate_operation("write", filename, agent, checksum):
-        return "Error: File has already been updated."
+        return "Info: File has already been updated."
     try:
         directory = os.path.dirname(filename)
         os.makedirs(directory, exist_ok=True)

@@ -173,7 +173,7 @@ def test_log_operation(agent: Agent) -> None:
     file_ops.log_operation("log_test", "path/to/test", agent=agent)
     with open(agent.config.file_logger_path, "r", encoding="utf-8") as f:
         content = f.read()
-    assert f"log_test: path/to/test\n" in content
+    assert "log_test: path/to/test\n" in content
 
 
 def test_text_checksum(file_content: str) -> None:
@@ -187,7 +187,7 @@ def test_log_operation_with_checksum(agent: Agent) -> None:
     file_ops.log_operation("log_test", "path/to/test", agent=agent, checksum="ABCDEF")
     with open(agent.config.file_logger_path, "r", encoding="utf-8") as f:
         content = f.read()
-    assert f"log_test: path/to/test #ABCDEF\n" in content
+    assert "log_test: path/to/test #ABCDEF\n" in content
 
 
 def test_read_file(
@@ -240,7 +240,7 @@ def test_write_file_fails_if_content_exists(test_file_name: Path, agent: Agent) 
         checksum=file_ops.text_checksum(new_content),
     )
     result = file_ops.write_to_file(str(test_file_name), new_content, agent=agent)
-    assert result == "Error: File has already been updated."
+    assert result == "Info: File has already been updated."
 
 
 def test_write_file_succeeds_if_content_different(

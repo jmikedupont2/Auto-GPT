@@ -2,7 +2,7 @@
 
 Turbo is the high-octane testing ground for experimental Auto-GPT features. Will these next-gen innovations race into Auto-GPT's lineup or get left in the dust?
 
-[ [Setup Auto-GPT-Turbo](/turbo/docs/setup.md) | [Personas](/turbo/docs/personas.md) ]
+[ [Setup Auto-GPT-Turbo](/turbo/docs/setup.md) | [Presets](/turbo/docs/presets.md) ]
 
 ## Revving Up Performance
 - In gear with the latest stable Auto-GPT (v0.4.7)
@@ -13,7 +13,7 @@ Turbo is the high-octane testing ground for experimental Auto-GPT features. Will
 
 What we're testing ...
 
-### Personas
+### Presets (aka. Examples)
 
 > _Customized AI roles, goals & settings for instant execution_
 
@@ -23,9 +23,11 @@ What we're testing ...
 - kerouac - Unleash your literary instincts and write like a seasoned novelist.
 - madison - A haven for creativity and innovation.
 
-Personas are pre-configured roles, goals, and prompts that modify the LLM behavior. You can elevate your productivity with the packaged Personas or change them to create your own. The roadmap includes task-level auto-selection, goal-level persona switching, and the ability to save and share personas.
+Prompts can change the way the LLMs respond and ultimately make them more or less effective. Use presets to speed up your tasks,fulfill specialized tasks, or as examples of Auto-GPT's capabilities.
 
-See [Personas](/turbo/docs/personas.md) for more details.
+Presets are pre-configured roles, goals, and prompts that modify the LLM behavior. You can elevate your productivity with the packaged Presets or change them to create your own. The roadmap includes task-level auto-selection, goal-level perset switching, and the ability to save and share presets.
+
+See [Presets](/turbo/docs/presets.md) for more details.
 
 ### Agent Orchestrator
 

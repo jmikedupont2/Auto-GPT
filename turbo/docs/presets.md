@@ -1,4 +1,4 @@
-# Personas
+# Presets
 
 > _Customized AI roles, goals & settings for instant execution_
 
@@ -8,37 +8,39 @@
 - **kerouac** (in development) - Unleash your literary instincts and write like a seasoned novelist.
 - **madison** (in development) - A haven for creativity and innovation.
 
-Personas are pre-configured roles, goals, and prompts that modify the LLM behavior. You can elevate your productivity with the packaged Personas or change them to create your own. The roadmap includes task-level auto-selection, goal-level persona switching, and the ability to save and share personas.
+Prompts can change the way the LLMs respond and ultimately make them more or less effective. Use presets to speed up your tasks,fulfill specialized tasks, or as examples of Auto-GPT's capabilities.
 
-## How to install Personas
+Presets are pre-configured roles, goals, and prompts that modify the LLM behavior. You can elevate your productivity with the packaged Presets or change them to create your own. The roadmap includes task-level auto-selection, goal-level preset switching, and the ability to save and share presets.
 
-To access Personas install Auto-GPT Turbo, then follow the instructions below to run Auto-GPT Turbo with a Persona.
+## How to install Presets
+
+To access Presets install Auto-GPT Turbo, then follow the instructions below to run Auto-GPT Turbo with a Preset.
 
 See [Setting Up Auto-GPT-Turbo](/turbo/docs/setup.md) for installation instructions.
 
-## How to use Personas
+## How to use Presets
 
 This feature adds 3 new options to the autogpt CLI; 
-- `autogpt --persona <persona>` - Load the persona, overriding any name, role and goal settings.
-- `autogpt --inherit-persona <persona>` - Inherit the persona prompts and behavior, but keep the current name, role and goal settings. 
-- `autogpt --personas` - List the available personas.
+- `autogpt --preset <preset>` - Load the preset, overriding any name, role and goal settings.
+- `autogpt --inherit-preset <preset>` - Inherit the preset prompts and behavior, but keep the current name, role and goal settings. 
+- `autogpt --presets` - List the available presets.
 
-For example, to use the `codezilla.planner` persona, run the following command:
+For example, to use the `codezilla.planner` preset, run the following command:
 
 ```bash
-python -m autogpt --persona codezilla.planner
+python -m autogpt --preset codezilla.planner
 ```
 
 or
 
 ```bash
-./run.sh --persona codezilla.planner
+./run.sh --preset codezilla.planner
 ```
 
-## Persona Details
+## Preset Details
 
 ### turbo
-Auto-GPT Turbo loads this persona by default. 
+Auto-GPT Turbo loads this preset by default. 
   - **Speed**: Compared to the base 0.4.7 profile, `turbo` is tuned for a balance between speed and efficiency. 
 
   - **One-shot responses**: It's more likely to give one-shot responses when it can, rather than do a web search for information that GPT-4 already knows.
@@ -59,7 +61,7 @@ Planning is the first step in the software development lifecycle. It's the proce
 
 ## Contributing
 
-What Personas would you like to see? Is there a Persona you'd like to contribute?
+What Presets would you like to see? Is there a Preset you'd like to contribute?
 
 Share your feedback on discord (@lc0rp), or by opening an issue on GitHub.
 

@@ -89,18 +89,24 @@ import click
 )
 @click.option(
     "--persona",
+    "--preset",
+    "--example",
     type=str,
-    help="Load a preset AI Persona.",
+    help="Load a preset AI config.",
 )
 @click.option(
     "--inherit-persona",
+    "--inherit-preset",
+    "--inherit-example",
     type=str,
-    help="Load preset AI Persona characteristics (prompt settings), while enabling you to set your own AI name, role, and goals.",
+    help="Load a preset AI config, while enabling you to set your own AI name, role, and goals.",
 )
 @click.option(
     "--personas",
+    "--presets",
+    "--examples",
     is_flag=True,
-    help="List available preset AI Personas.",
+    help="List available preset AI configs.",
 )
 @click.pass_context
 def main(
@@ -122,10 +128,10 @@ def main(
     install_plugin_deps: bool,
     ai_name: Optional[str],
     ai_role: Optional[str],
-    ai_goal: tuple[str],
-    persona: Optional[str],
-    inherit_persona: Optional[str],
-    personas: bool,
+    ai_goal: Optional[tuple[str]],
+    preset: Optional[str],
+    inherit_preset: Optional[str],
+    presets: bool,
 ) -> None:
     """
     Welcome to AutoGPT an experimental open-source application showcasing the capabilities of the GPT-4 pushing the boundaries of AI.
@@ -134,25 +140,26 @@ def main(
     """
     # Put imports inside function to avoid importing everything when starting the CLI
     from autogpt.app.main import run_auto_gpt
-    from turbo.personas import PersonaManager
+    from turbo.presets import PresetManager
 
-    if personas:
-        PersonaManager.list()
+    # Turbo: skip_news = True
+    skip_news = True
+
+    if presets:
+        PresetManager.list()
         return
 
-    if persona:
-        ai_settings, prompt_settings = PersonaManager.load(persona)
+    if preset:
+        ai_settings, prompt_settings = PresetManager.load(preset)
         ai_name = ai_role = ai_goal = None
         skip_reprompt = True
-        skip_news = True
 
-    if inherit_persona:
-        prompt_settings = PersonaManager.load_prompts(inherit_persona)
-        skip_news = True
+    if inherit_preset:
+        prompt_settings = PresetManager.load_prompts(inherit_preset)
 
     # Default to turbo prompts
-    if not (persona or inherit_persona or prompt_settings):
-        prompt_settings = PersonaManager.load_prompts("turbo")
+    if not (preset or inherit_preset or prompt_settings):
+        prompt_settings = PresetManager.load_prompts("turbo")
 
     if ctx.invoked_subcommand is None:
         run_auto_gpt(

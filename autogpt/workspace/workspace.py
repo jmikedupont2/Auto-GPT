@@ -9,8 +9,9 @@ agent.
 """
 from __future__ import annotations
 
+import time
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from autogpt.config import Config
 from autogpt.logs import logger
@@ -20,6 +21,7 @@ class Workspace:
     """A class that represents a workspace for an AutoGPT agent."""
 
     NULL_BYTES = ["\0", "\000", "\x00", "\u0000"]
+    _file_logger_path = None
 
     def __init__(self, workspace_root: str | Path, restrict_to_workspace: bool):
         self._root = self._sanitize_path(workspace_root)
@@ -31,12 +33,14 @@ class Workspace:
         return self._root
 
     @property
-    def restrict_to_workspace(self):
+    def restrict_to_workspace(self) -> bool:
         """Whether to restrict generated paths to the workspace."""
         return self._restrict_to_workspace
 
     @classmethod
-    def make_workspace(cls, workspace_directory: str | Path, *args, **kwargs) -> Path:
+    def make_workspace(
+        cls, workspace_directory: str | Path, *args: Any, **kwargs: Any
+    ) -> Path:
         """Create a workspace directory and return the path to it.
 
         Parameters
@@ -148,11 +152,18 @@ class Workspace:
         # file_logger_path = workspace_directory / "file_logger.txt"
         # Do not mess up the workspace with unwanted files (benchmarks)
         # TODO: Turn this into a config option, and use platformdirs
-        file_logger_path = Path(__file__).parent.parent.parent / "logs" / "file_logger.txt"
-        if not file_logger_path.exists():
-            with file_logger_path.open(mode="w", encoding="utf-8") as f:
-                f.write("File Operation Logger ")
-        return file_logger_path
+        if not Workspace._file_logger_path:
+            current_timestamp = int(time.time())
+            file_logger_path = (
+                Path(__file__).parent.parent.parent
+                / "logs"
+                / f"file_logger_{current_timestamp}.txt"
+            )
+            if not file_logger_path.exists():
+                with file_logger_path.open(mode="w", encoding="utf-8") as f:
+                    f.write("File Operation Logger ")
+            Workspace._file_logger_path = file_logger_path
+        return Workspace._file_logger_path
 
     @staticmethod
     def init_workspace_directory(

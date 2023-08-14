@@ -39,7 +39,21 @@
 		"GitHub.vscode-pull-request-github",
 		"GitHub.copilot",
 		"github.vscode-github-actions",
-		"redhat.fabric8-analytics"
+		"redhat.fabric8-analytics",
+		"Gerrnperl.outline-map",
+		"ziyasal.vscode-open-in-github",
+		"slevesque.vscode-multiclip",
+		"wekex.JsonLint",
+		"GitHub.copilot-chat",
+		"oderwat.indent-rainbow",
+		"Cameron.vscode-pytest",
+		"demystifying-javascript.python-extensions-pack",
+		"mhutchie.git-graph",
+		"donjayamanne.githistory",
+		"shyykoserhiy.git-autoconfig",
+		"waderyan.gitblame",
+		"DanielSanMedium.dscodegpt",
+		"charliermarsh.ruff"
 	]
     }
   },
