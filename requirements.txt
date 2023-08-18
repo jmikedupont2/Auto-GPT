@@ -21,7 +21,7 @@ redis
 orjson==3.8.10
 ftfy>=6.1.1
 Pillow
-selenium==4.1.4
+selenium==4.11.2
 webdriver-manager
 jsonschema
 click

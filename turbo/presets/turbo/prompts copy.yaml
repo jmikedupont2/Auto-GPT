@@ -1,14 +1,14 @@
 triggering_prompt2: |
   1. Using available commands, work out the list of remaining commands to accomplish your goals, accounting for progress made so far.
-  2. Analyze the list carefully, and consider whether any commands can be accurately combined using 'docmds' and executed one after another with no intervention. You can use '<prev_result>' to pass command output verb atim to the next command. You must be sure. No guessing.
-  3. Generate a new list with the commands in order, including 'docmds' combined commands, if any. The list must have at least one command.
+  2. Analyze the list carefully, and consider whether any commands can be accurately combined using 'xcmds' and executed one after another with no intervention. You can use '<prev_result>' to pass command output verb atim to the next command. You must be sure. No guessing.
+  3. Generate a new list with the commands in order, including 'xcmds' combined commands, if any. The list must have at least one command.
   4. Respond with the first command in your list, to execute right now. Only share multiple commands if they can be accurately combined and executed one after another with no intervention. No guessing. The list must have at least one command. Execution results shall be returned to you.
   5. Your response MUST use the JSON schema specified previously:
 
 triggering_prompt: |
   Analyze the remaining goals, your progress, and the available commands; and work out the next 3 to 5 commands that must be executed to accomplish the goals. List these next commands in your thoughts. Your objective is to select the best command to execute next, according to the goals' requirements. 
 
-  Now analyze the liset of next commands. If any consecutive commands in your list do not need intervention and can be accurately combined using docmds, combine them now, to form an updated list. Add the full updated list in your thoughts. If you do not use "docmds", explain your reasoning.
+  Now analyze the list of next commands. If any consecutive commands in your list do not need intervention and can be accurately combined using xcmds, combine them now, to form an updated list. Add the full updated list in your thoughts. If you do not use "xcmds", explain your reasoning.
 
   Respond with the next command to execute right now. Your response MUST use the JSON schema specified previously.
 
@@ -34,5 +34,5 @@ resources: [
 best_practices: [
   'Avoid redundant, unnecessary steps like immediate verification of outcomes and repetitive function calls.',
   'Work out your tasks in a step-by-step way to be sure you have the right answer.',
-  'docmds; Among the commands is a special function called docmds that can efficiently execute a list of consecutive commands, as long as they do not require intervention. It works for both independent commands AND for dependent commands. For dependent commands, it has a nifty extra feature - it can pass the output of one command to the next if the next command has an argument containing <prev_input>. Using docmds is crucial for efficiency. You must use it whenever commands can be executed consecutively without intervention. For instance, if cmd1 = read_file1 and cmd = write_results_to_file2, you must use docmds. But if cmd = read_file1 and cmd2 = write_vowels_to_file2, this requires intervention to analyze the output of cmd1 before passing it to cmd2. You cannot use docmds in this case. Of course, you can also use docmds to write to file1 and then read from file 2 in one go.'
+  'xcmds; Among the commands is a special function called xcmds that can efficiently execute a list of consecutive commands, as long as they do not require intervention. It works for both independent commands AND for dependent commands. For dependent commands, it has a nifty extra feature - it can pass the output of one command to the next if the next command has an argument containing <prev_input>. Using xcmds is crucial for efficiency. You must use it whenever commands can be executed consecutively without intervention. For instance, if cmd1 = read_file1 and cmd = write_results_to_file2, you must use xcmds. But if cmd = read_file1 and cmd2 = write_vowels_to_file2, this requires intervention to analyze the output of cmd1 before passing it to cmd2. You cannot use xcmds in this case. Of course, you can also use xcmds to write to file1 and then read from file 2 in one go.'
 ]

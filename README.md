@@ -13,7 +13,7 @@ Turbo is the high-octane testing ground for experimental Auto-GPT features. Will
 
 What we're testing ...
 
-### Presets (aka. Examples)
+### A. Presets
 
 > _Customized AI roles, goals & settings for instant execution_
 
@@ -29,7 +29,7 @@ Presets are pre-configured roles, goals, and prompts that modify the LLM behavio
 
 See [Presets](/turbo/docs/presets.md) for more details.
 
-### Agent Orchestrator
+### B. Agent Orchestrator
 
 > _Route jobs to The Best Agent :tm:_
 

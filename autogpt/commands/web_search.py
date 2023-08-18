@@ -18,18 +18,18 @@ DUCKDUCKGO_MAX_ATTEMPTS = 3
 
 
 @command(
-    "ws",
-    "Searches the web",
+    "search",
+    "Searches the web.",
     {
-        "q": {
+        "query": {
             "type": "string",
             "description": "The search query",
             "required": True,
         }
     },
-    aliases=["web_search", "search"],
+    aliases=["web_search"],
 )
-def web_search(q: str, agent: Agent, num_results: int = 8) -> str:
+def web_search(query: str, agent: Agent, num_results: int = 8) -> str:
     """Return the results of a Google search
 
     Args:
@@ -43,10 +43,10 @@ def web_search(q: str, agent: Agent, num_results: int = 8) -> str:
     attempts = 0
 
     while attempts < DUCKDUCKGO_MAX_ATTEMPTS:
-        if not q:
+        if not query:
             return json.dumps(search_results)
 
-        results = DDGS().text(q)
+        results = DDGS().text(query)
         search_results = list(islice(results, num_results))
 
         if search_results:
@@ -72,7 +72,7 @@ def web_search(q: str, agent: Agent, num_results: int = 8) -> str:
     lambda config: bool(config.google_api_key)
     and bool(config.google_custom_search_engine_id),
     "Configure google_api_key and custom_search_engine_id.",
-    aliases=["search"],
+    aliases=["search", "google"],
 )
 def google(query: str, agent: Agent, num_results: int = 8) -> str | list[str]:
     """Return the results of a Google search using the official Google API
@@ -84,7 +84,6 @@ def google(query: str, agent: Agent, num_results: int = 8) -> str | list[str]:
     Returns:
         str: The results of the search.
     """
-
     from googleapiclient.discovery import build
     from googleapiclient.errors import HttpError
 

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-
 COMMAND_CATEGORY = "file_operations"
 COMMAND_CATEGORY_TITLE = "File Operations"
 from autogpt.agents.agent import Agent, execute_command
@@ -10,12 +9,12 @@ from autogpt.command_decorator import command
 
 
 @command(
-    "docmds",
-    "Efficiently execute many commands (do cmds). Use <prev_result> to pass command output to the next command.",
+    "xcmds",
+    "Efficiently execute many commands. Can use <prev_result> to pass command output to the next command, if necessary.",
     {
         "cmds": {
-            "type": "list[{n: str, a: dict[str, object]}]",
-            "description": "A list of command names (n) and their arguments (a).",
+            "type": "list[{name: str, args: dict[str, object]}]",
+            "description": "A list of command names (name) and their arguments (args).",
             "required": True,
         },
     },
@@ -33,8 +32,8 @@ def execute_commands(cmds: list, agent: Agent) -> str:
     results = []
     prev_result = None
     for item in cmds:
-        command_name = item["n"]
-        command_args = item["a"]
+        command_name = item["name"]
+        command_args = item["args"]
         new_command_args = {}
         for arg in command_args:
             if prev_result is not None and isinstance(command_args[arg], str):
@@ -52,7 +51,7 @@ def execute_commands(cmds: list, agent: Agent) -> str:
 
         prev_result = result
 
-    return "##Execution Results:\n" + "\n".join(
+    return "\n##Execution Results:\n" + "\n".join(
         f"{i}. {command_name} returned: {result}"
         for i, (command_name, result) in enumerate(results, 1)
     )

@@ -1,5 +1,6 @@
 # Use an official Python base image from the Docker Hub
-FROM python:3.10
+# Add --platform=linux/amd64 for the M1 Mac (https://stackoverflow.com/a/71611002)
+FROM --platform=linux/amd64 python:3.10
 
 # Install browsers
 RUN apt-get update && apt-get install -y \

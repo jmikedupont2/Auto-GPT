@@ -2,30 +2,30 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-        "thts": {
+        "mind": {
             "type": "object",
             "properties": {
-                "t": {
+                "reflect": {
                     "type": "string",
-                    "description": "thoughts"
+                    "description": "thoughts and reasoning"
                 },
-                "p": {
+                "plan": {
                     "type": "string",
                     "description": "- short bulleted\n- list that conveys\n- long-term plan"
                 }
             },
-            "required": ["p"],
+            "required": ["plan"],
             "additionalProperties": false
         },
         "cmd": {
             "type": "object",
             "properties": {
-                "n": {"t": "string"},
-                "a": {
+                "name": {"t": "string"},
+                "args": {
                     "type": "object"
                 }
             },
-            "required": ["n", "a"],
+            "required": ["name", "args"],
             "additionalProperties": false
         }
     }

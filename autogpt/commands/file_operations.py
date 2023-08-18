@@ -140,10 +140,10 @@ def log_operation(
 
 
 @command(
-    "rf",
-    "Read an existing file",
+    "read",
+    "Read <file> and return its contents.",
     {
-        "f": {
+        "file": {
             "type": "string",
             "description": "The path of the file to read",
             "required": True,
@@ -153,21 +153,21 @@ def log_operation(
         "read_file",
     ],
 )
-@sanitize_path_arg("f")
-def read_file(f: str, agent: Agent) -> str:
+@sanitize_path_arg("file")
+def read_file(file: str, agent: Agent) -> str:
     """Read a file and return the contents
 
     Args:
-        filename (str): The name of the file to read
+        file (str): The name of the file to read
 
     Returns:
         str: The contents of the file
     """
     try:
-        content = read_textual_file(f, logger)
+        content = read_textual_file(file, logger)
 
         # TODO: invalidate/update memory when file is edited
-        file_memory = MemoryItem.from_text_file(content, f, agent.config)
+        file_memory = MemoryItem.from_text_file(content, file, agent.config)
         if len(file_memory.chunks) > 1:
             return file_memory.summary
 
@@ -203,15 +203,15 @@ def ingest_file(
 
 
 @command(
-    "wf",
-    "Writes to a file, overwriting existing contents.",
+    "write",
+    "Writes <text> to <file>, overwriting existing contents.",
     {
-        "f": {
+        "file": {
             "type": "string",
             "description": "The name of the file to write to",
             "required": True,
         },
-        "t": {
+        "text": {
             "type": "string",
             "description": "The text to write to the file",
             "required": True,
@@ -219,26 +219,26 @@ def ingest_file(
     },
     aliases=["write_to_file", "write_file", "create_file"],
 )
-@sanitize_path_arg("f")
-def write_to_file(f: str, t: str, agent: Agent) -> str:
+@sanitize_path_arg("file")
+def write_to_file(file: str, text: str, agent: Agent) -> str:
     """Write text to a file
 
     Args:
-        filename (str): The name of the file to write to
+        file (str): The name of the file to write to
         text (str): The text to write to the file
 
     Returns:
         str: A message indicating success or failure
     """
-    checksum = text_checksum(t)
-    if is_duplicate_operation("write", f, agent, checksum):
-        return "Info: File has already been updated."
+    checksum = text_checksum(text)
+    if is_duplicate_operation("write", file, agent, checksum):
+        return "Info: File has already been updated. Change the text to write to update the file."
     try:
-        directory = os.path.dirname(f)
+        directory = os.path.dirname(file)
         os.makedirs(directory, exist_ok=True)
-        with open(f, "w", encoding="utf-8") as _f:
-            _f.write(t)
-        log_operation("write", f, agent, checksum)
+        with open(file, "w", encoding="utf-8") as _f:
+            _f.write(text)
+        log_operation("write", file, agent, checksum)
         return "File written to successfully."
     except Exception as err:
         return f"Error: {err}"
@@ -275,29 +275,30 @@ def append_to_file(
 
 
 @command(
-    "list_files",
-    "Lists Files in a Directory",
+    "list",
+    "Lists files in <dir> recursively.",
     {
-        "directory": {
+        "dir": {
             "type": "string",
             "description": "The directory to list files in",
             "required": True,
         }
     },
+    aliases=["list_files"],
 )
-@sanitize_path_arg("directory")
-def list_files(directory: str, agent: Agent) -> list[str]:
+@sanitize_path_arg("dir")
+def list_files(dir: str, agent: Agent) -> list[str]:
     """lists files in a directory recursively
 
     Args:
-        directory (str): The directory to search in
+        dir (str): The directory to search in
 
     Returns:
         list[str]: A list of files found in the directory
     """
     found_files = []
 
-    for root, _, files in os.walk(directory):
+    for root, _, files in os.walk(dir):
         for file in files:
             if file.startswith("."):
                 continue

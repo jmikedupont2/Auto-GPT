@@ -235,12 +235,12 @@ def extract_command(
         if assistant_reply.function_call is None:
             return "Error:", {"message": "No 'function_call' in assistant reply"}
         assistant_reply_json["cmd"] = {
-            "n": assistant_reply.function_call.name,
-            "a": json.loads(assistant_reply.function_call.arguments),
+            "name": assistant_reply.function_call.name,
+            "args": json.loads(assistant_reply.function_call.arguments),
         }
     try:
         if "cmd" not in assistant_reply_json:
-            return "Error:", {"message": "Missing 'command' object in JSON"}
+            return "Error:", {"message": "Missing 'cmd' object in JSON"}
 
         if not isinstance(assistant_reply_json, dict):
             return (
@@ -254,13 +254,13 @@ def extract_command(
         if not isinstance(command, dict):
             return "Error:", {"message": "'cmd' object is not a dictionary"}
 
-        if "n" not in command:
-            return "Error:", {"message": "Missing 'n' field in 'cmd' object"}
+        if "name" not in command:
+            return "Error:", {"message": "Missing 'name' field in 'cmd' object"}
 
-        command_name = command["n"]
+        command_name = command["name"]
 
         # Use an empty dictionary if 'args' field is not present in 'command' object
-        arguments = command.get("a", {})
+        arguments = command.get("args", {})
 
         return command_name, arguments
     except json.decoder.JSONDecodeError:
@@ -299,8 +299,7 @@ def execute_command(
                 return command.function(**arguments)
 
         raise RuntimeError(
-            f"Cannot execute '{command_name}': unknown command."
-            " Do not try to use this command again."
+            f"Cannot execute '{command_name}': unknown cmd." " Do not use it again."
         )
     except Exception as e:
         return f"Error: {str(e)}"

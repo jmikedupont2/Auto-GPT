@@ -25,28 +25,29 @@ TIMEOUT_SECONDS: int = 900
 
 
 @command(
-    "execute_python_code",
-    "Creates a Python file and executes it",
+    "py",
+    "Execute Python <code> by writing it to file: ./<ai-name>/executed_code/<file>, and running the resulting script.",
     {
         "code": {
             "type": "string",
-            "description": "The Python code to run",
+            "description": "The Python code to execute",
             "required": True,
         },
-        "name": {
+        "file": {
             "type": "string",
             "description": "A name to be given to the python file",
             "required": True,
         },
     },
+    aliases=["execute_python_code"],
 )
-def execute_python_code(code: str, name: str, agent: Agent) -> str:
+def execute_python_code(code: str, file: str, agent: Agent) -> str:
     """Create and execute a Python file in a Docker container and return the STDOUT of the
     executed code. If there is any data that needs to be captured use a print statement
 
     Args:
         code (str): The Python code to run
-        name (str): A name to be given to the Python file
+        file(str): A file name to be given to the Python file
         agent (Agent): The agent that is executing the command
 
     Returns:
@@ -56,14 +57,16 @@ def execute_python_code(code: str, name: str, agent: Agent) -> str:
     code_dir = agent.workspace.get_path(Path(ai_name, "executed_code"))
     os.makedirs(code_dir, exist_ok=True)
 
-    if not name.endswith(".py"):
-        name = name + ".py"
+    if not file.endswith(".py"):
+        file = file + ".py"
 
     # The `name` arg is not covered by @sanitize_path_arg,
     # so sanitization must be done here to prevent path traversal.
-    file_path = agent.workspace.get_path(code_dir / name)
+    file_path = agent.workspace.get_path(code_dir / file)
     if not file_path.is_relative_to(code_dir):
-        return "Error: 'name' argument resulted in path traversal, operation aborted"
+        return (
+            "Error: 'filename' argument resulted in path traversal, operation aborted"
+        )
 
     try:
         with open(file_path, "w+", encoding="utf-8") as f:
@@ -75,44 +78,43 @@ def execute_python_code(code: str, name: str, agent: Agent) -> str:
 
 
 @command(
-    "execute_python_file",
-    "Executes an existing Python file",
+    "pyf",
+    "Executes an existing Python <file> in the workspace.",
     {
-        "filename": {
+        "file": {
             "type": "string",
-            "description": "The name of the file to execute",
+            "description": "The file of the file to execute",
             "required": True,
         },
     },
+    aliases=["execute_python_file"],
 )
-@sanitize_path_arg("filename")
-def execute_python_file(filename: str, agent: Agent) -> str:
+@sanitize_path_arg("file")
+def execute_python_file(file: str, agent: Agent) -> str:
     """Execute a Python file in a Docker container and return the output
 
     Args:
-        filename (str): The name of the file to execute
+        file (str): The name of the file to execute
         agent (Agent): The agent that is executing the command
 
     Returns:
         str: The output of the file
     """
     logger.info(
-        f"Executing python file '{filename}' in working directory '{agent.config.workspace_path}'"
+        f"Executing python file '{file}' in working directory '{agent.config.workspace_path}'"
     )
 
-    if not filename.endswith(".py"):
+    if not file.endswith(".py"):
         return "Error: Invalid file type. Only .py files are allowed."
 
-    file_path = Path(filename)
+    file_path = Path(file)
     if not file_path.is_file():
         # Mimic the response that you get from the command line so that it's easier to identify
-        return (
-            f"python: can't open file '{filename}': [Errno 2] No such file or directory"
-        )
+        return f"python: can't open file '{file}': [Errno 2] No such file or directory"
 
     if we_are_running_in_a_docker_container():
         logger.debug(
-            f"Auto-GPT is running in a Docker container; executing {file_path} directly..."
+            f"Running in a Docker container; executing {file_path} directly..."
         )
         result = subprocess.run(
             ["python", str(file_path)],
@@ -125,7 +127,7 @@ def execute_python_file(filename: str, agent: Agent) -> str:
         else:
             return f"Error: {result.stderr}"
 
-    logger.debug("Auto-GPT is not running in a Docker container")
+    logger.debug("Not running in a Docker container")
     try:
         client = docker.from_env()
         # You can replace this with the desired Python image/version
@@ -211,7 +213,7 @@ def validate_command(command: str, config: Config) -> bool:
 
 @command(
     "sh",
-    "Executes a Shell Command, non-interactive commands only",
+    "Executes non-interactive shell command string (<cmd>).",
     {
         "cmd": {
             "type": "string",
@@ -230,7 +232,7 @@ def execute_shell(cmd: str, agent: Agent) -> str:
     """Execute a shell command and return the output
 
     Args:
-        command_line (str): The command line to execute
+        cmd (str): The command line to execute
         agent (Agent): The agent that is executing the command
 
     Returns:
@@ -504,10 +506,10 @@ def _exec_cross_platform(command_line: str) -> list[dict]:
 
 
 @command(
-    "ask_user",
-    "Ask the user a series of questions and return the responses.",
+    "ask",
+    "Ask the user a series of questions <qs> and return the responses.",
     {
-        "prompts": {
+        "qs": {
             "type": "list[str]",
             "description": "The questions to ask the user.",
             "required": True,
@@ -515,12 +517,13 @@ def _exec_cross_platform(command_line: str) -> list[dict]:
     },
     lambda config: not config.continuous_mode,
     "The agent is running in continuous mode.",
+    aliases=["ask_user"],
 )
-def ask_user(prompts: list[str], agent: Agent) -> list[str]:
+def ask_user(qs: list[str], agent: Agent) -> list[str]:
     """Ask the user a series of prompts and return the responses
 
     Args:
-        prompts (list[str]): The prompts to ask the user
+        qs (list[str]): The prompts to ask the user
         agent (Agent): The agent that is executing the command
 
     Returns:
@@ -531,7 +534,7 @@ def ask_user(prompts: list[str], agent: Agent) -> list[str]:
 
     results = []
     try:
-        for prompt in prompts:
+        for prompt in qs:
             response = inputimeout(prompt, timeout=TIMEOUT_SECONDS)
             results.append(response)
     except TimeoutOccurred:

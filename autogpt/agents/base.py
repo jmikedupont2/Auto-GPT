@@ -229,32 +229,32 @@ class BaseAgent(metaclass=ABCMeta):
         if self.config.debug_mode:
             RESPONSE_FORMAT_WITH_COMMAND = """```ts
             interface Response {
-                thts: {
+                mind: {
                     /* Thoughts & reasoning */
-                    t: string;
+                    reflect: string;
                     /* Long-term plan as short markdown bullet list */
-                    p: string;
+                    plan: string;
                 };
                 cmd: {
                     /* Command Name */
-                    n: string;
+                    name: string;
                     /* Command Args */
-                    a: Record<string, any>;
+                    args: Record<string, any>;
                 };
             }
             ```"""
         else:
             RESPONSE_FORMAT_WITH_COMMAND = """```ts
             interface Response {
-                thts: {
+                mind: {
                     /* Long-term plan as short markdown bullet list */
-                    p: string;
+                    plan: string;
                 };
                 cmd: {
                     /* Command Name */
-                    n: string;
+                    name: string;
                     /* Command Args */
-                    a: Record<string, any>;
+                    args: Record<string, any>;
                 };
             }
             ```"""
@@ -276,7 +276,7 @@ class BaseAgent(metaclass=ABCMeta):
         ```"""
 
         response_format = re.sub(
-            r"\n\s+",
+            r"(\n\s+|\n+)",
             "",
             RESPONSE_FORMAT_WITHOUT_COMMAND
             if self.config.openai_functions
@@ -286,8 +286,8 @@ class BaseAgent(metaclass=ABCMeta):
         use_functions = self.config.openai_functions and self.command_registry.commands
         return (
             f"Respond strictly with JSON{', and also specify a command to use through a function_call' if use_functions else ''}. "
-            "The JSON should be compatible with the TypeScript type `Response` from the following, with no newlines:\n"
-            f"{response_format}\n"
+            "The JSON should be compatible with the TypeScript type `Response` from the following, with no unnecessary newlines:\n"
+            f"{response_format}"
         )
 
     def on_before_think(

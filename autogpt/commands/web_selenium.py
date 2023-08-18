@@ -47,16 +47,21 @@ LINKS_TO_RETURN = 20
 
 
 @command(
-    "browse_website",
-    "Browses a Website",
+    "www",
+    "Browses a website.",
     {
-        "url": {"type": "string", "description": "The URL to visit", "required": True},
+        "url": {
+            "type": "string",
+            "description": "The URL to visit",
+            "required": True,
+        },
         "question": {
             "type": "string",
-            "description": "What you want to find on the website",
+            "description": "What you want to find on the website.",
             "required": True,
         },
     },
+    aliases=["browse", "browse_website"],
 )
 @validate_url
 def browse_website(url: str, question: str, agent: Agent) -> str:
