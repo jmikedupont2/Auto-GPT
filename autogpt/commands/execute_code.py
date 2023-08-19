@@ -79,38 +79,38 @@ def execute_python_code(code: str, file: str, agent: Agent) -> str:
 
 @command(
     "pyf",
-    "Executes an existing Python <file> in the workspace.",
+    "Execute the Python script at <path> (ending in .py) by running 'python <path>' and return the output.",
     {
-        "file": {
+        "path": {
             "type": "string",
-            "description": "The file of the file to execute",
+            "description": "The file path execute",
             "required": True,
         },
     },
     aliases=["execute_python_file"],
 )
-@sanitize_path_arg("file")
-def execute_python_file(file: str, agent: Agent) -> str:
+@sanitize_path_arg("path")
+def execute_python_file(path: str, agent: Agent) -> str:
     """Execute a Python file in a Docker container and return the output
 
     Args:
-        file (str): The name of the file to execute
+        path (str): The name of the file to execute
         agent (Agent): The agent that is executing the command
 
     Returns:
         str: The output of the file
     """
     logger.info(
-        f"Executing python file '{file}' in working directory '{agent.config.workspace_path}'"
+        f"Executing python file '{path}' in working directory '{agent.config.workspace_path}'"
     )
 
-    if not file.endswith(".py"):
+    if not path.endswith(".py"):
         return "Error: Invalid file type. Only .py files are allowed."
 
-    file_path = Path(file)
+    file_path = Path(path)
     if not file_path.is_file():
         # Mimic the response that you get from the command line so that it's easier to identify
-        return f"python: can't open file '{file}': [Errno 2] No such file or directory"
+        return f"python: can't open file '{path}': [Errno 2] No such file or directory"
 
     if we_are_running_in_a_docker_container():
         logger.debug(
@@ -122,10 +122,7 @@ def execute_python_file(file: str, agent: Agent) -> str:
             encoding="utf8",
             cwd=agent.config.workspace_path,
         )
-        if result.returncode == 0:
-            return result.stdout
-        else:
-            return f"Error: {result.stderr}"
+        return result.stdout if result.returncode == 0 else f"Error: {result.stderr}"
 
     logger.debug("Not running in a Docker container")
     try:

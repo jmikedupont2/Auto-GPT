@@ -226,7 +226,7 @@ class BaseAgent(metaclass=ABCMeta):
         if thought_process_id != "one-shot":
             raise NotImplementedError(f"Unknown thought process '{thought_process_id}'")
 
-        if self.config.debug_mode:
+        if self.config.return_llm_thoughts:
             RESPONSE_FORMAT_WITH_COMMAND = """```ts
             interface Response {
                 mind: {
