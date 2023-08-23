@@ -1,4 +1,4 @@
-# Auto-GPT-Turbo
+# Turbo
 
 Turbo is the high-octane testing ground for experimental Auto-GPT features. Will these next-gen innovations race into Auto-GPT's lineup or get left in the dust?
 

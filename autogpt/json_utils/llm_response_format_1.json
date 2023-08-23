@@ -14,13 +14,12 @@
                     "description": "- short bulleted\n- list that conveys\n- long-term plan"
                 }
             },
-            "required": ["plan"],
             "additionalProperties": false
         },
         "cmd": {
             "type": "object",
             "properties": {
-                "name": {"t": "string"},
+                "name": {"type": "string"},
                 "args": {
                     "type": "object"
                 }
@@ -28,5 +27,7 @@
             "required": ["name", "args"],
             "additionalProperties": false
         }
-    }
+    },
+    "required": ["cmd"],
+    "additionalProperties": false
 }

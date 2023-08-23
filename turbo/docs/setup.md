@@ -1,6 +1,6 @@
-# Setting up Auto-GPT Turbo
+# Setting up Turbo
 
-Auto-GPT Turbo is a fork of the main Auto-GPT project. 
+Turbo is a fork of the main Auto-GPT project. 
 
 It is a drop-in replacement for the original, but at this time, it must be installed either by cloning the repository. Example installation instructions are below.
 
@@ -9,7 +9,7 @@ It is a drop-in replacement for the original, but at this time, it must be insta
 ### Linux/MacOS:
 
 ```bash
-virtualenv agpt-turbo-venv
+virtualenv turbo-venv
 source agpt-turbo-venv/bin/activate
 git clone https://github.com/lc0rp/Auto-GPT-Turbo.git
 cd Auto-GPT-Turbo
@@ -20,7 +20,7 @@ pip install -r requirements.txt
 ### Windows:
 
 ```bash
-virtualenv agpt-turbo-venv
+virtualenv turbo-venv
 agpt-turbo-venv\Scripts\activate.bat
 git clone https://github.com/lc0rp/Auto-GPT-Turbo.git
 cd Auto-GPT-Turbo

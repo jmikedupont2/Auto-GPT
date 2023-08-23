@@ -35,7 +35,7 @@ def bootstrap_agent(task: str) -> Agent:
 
     ai_config = construct_main_ai_config(
         config,
-        name="Auto-GPT-Turbo",
+        name="Turbo",
         role="a multi-purpose AI assistant that autonomously achieves its GOALS",
         goals=[task],
     )

@@ -19,7 +19,7 @@ constraints: [
   'THE COMMANDS and your intellect are the only tools you have. Use them exclusively.',
   'HIGHEST ACCURACY AND PRECISION required in your answers always, with references.',
   'ROBUSTNESS; You get one life. Watch out for commands that may cause you to crash or hang and workaround them, for example, wrap them in a sub-process with a timeout.',
-  'NO MISTAKES: You cannot affort syntax and logical errors. Watch out and fix them immediately.'
+  'NO MISTAKES: You cannot afford syntax and logical errors. Watch out and fix them immediately.'
 ]
 resources: [
   'Your List of GOALS', 
