@@ -18,8 +18,8 @@ DUCKDUCKGO_MAX_ATTEMPTS = 3
 
 
 @command(
-    "search",
-    "Searches the web.",
+    "search_internet",
+    "Search web.",
     {
         "query": {
             "type": "string",
@@ -27,7 +27,7 @@ DUCKDUCKGO_MAX_ATTEMPTS = 3
             "required": True,
         }
     },
-    aliases=["web_search"],
+    aliases=["web_search", "search", "aol"],
 )
 def web_search(query: str, agent: Agent, num_results: int = 8) -> str:
     """Return the results of a Google search

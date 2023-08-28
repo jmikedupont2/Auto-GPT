@@ -140,8 +140,8 @@ def log_operation(
 
 
 @command(
-    "read",
-    "Read <file> and return its contents.",
+    "read_file",
+    "Return <file> contents.",
     {
         "file": {
             "type": "string",
@@ -150,7 +150,7 @@ def log_operation(
         }
     },
     aliases=[
-        "read_file",
+        "read", "read_file", "cat"
     ],
 )
 @sanitize_path_arg("file")
@@ -203,8 +203,8 @@ def ingest_file(
 
 
 @command(
-    "write",
-    "Writes <text> to <file>, overwriting existing contents.",
+    "write_file",
+    "Overwrite <file> with <text>.",
     {
         "file": {
             "type": "string",
@@ -217,7 +217,7 @@ def ingest_file(
             "required": True,
         },
     },
-    aliases=["write_to_file", "write_file", "create_file"],
+    aliases=["write_to_file", "write", "create_file", "put"],
 )
 @sanitize_path_arg("file")
 def write_to_file(file: str, text: str, agent: Agent) -> str:
@@ -239,7 +239,7 @@ def write_to_file(file: str, text: str, agent: Agent) -> str:
         with open(file, "w", encoding="utf-8") as _f:
             _f.write(text)
         log_operation("write", file, agent, checksum)
-        return "File written to successfully."
+        return "Write successful."
     except Exception as err:
         return f"Error: {err}"
 
@@ -275,8 +275,8 @@ def append_to_file(
 
 
 @command(
-    "list",
-    "Lists files in <dir> recursively.",
+    "list_files",
+    "List files in <dir> recursively.",
     {
         "dir": {
             "type": "string",
@@ -284,7 +284,7 @@ def append_to_file(
             "required": True,
         }
     },
-    aliases=["list_files"],
+    aliases=["list", "ls"],
 )
 @sanitize_path_arg("dir")
 def list_files(dir: str, agent: Agent) -> list[str]:

@@ -199,6 +199,24 @@ class Agent(BaseAgent):
                 command_name, arguments = extract_command(
                     assistant_reply_dict, llm_response, self.config
                 )
+                if (
+                    hasattr(self, "last_command_name")
+                    and self.last_command_name == command_name
+                    and (
+                        hasattr(self, "last_arguments")
+                        and self.last_arguments == arguments
+                    )
+                ):
+                    logger.error("Duplicate command detected, exiting.")
+                    exit(1)
+                else:
+                    self.last_command_name = command_name
+                    self.last_arguments = arguments
+
+                if "llm_response.content" in self.history.messages:
+                    logger.error("Duplicate response detected, exiting.")
+                    exit(1)
+
                 response = command_name, arguments, assistant_reply_dict
             except Exception as e:
                 logger.error("Error: \n", str(e))
@@ -239,35 +257,41 @@ def extract_command(
             "args": json.loads(assistant_reply.function_call.arguments),
         }
     try:
-        if "cmd" not in assistant_reply_json:
-            return "Error:", {"message": "Missing 'cmd' object in JSON"}
-
-        if not isinstance(assistant_reply_json, dict):
-            return (
-                "Error:",
-                {
-                    "message": f"The previous message sent was not a dictionary {assistant_reply_json}"
-                },
-            )
-
-        command = assistant_reply_json["cmd"]
-        if not isinstance(command, dict):
-            return "Error:", {"message": "'cmd' object is not a dictionary"}
-
-        if "name" not in command:
-            return "Error:", {"message": "Missing 'name' field in 'cmd' object"}
-
-        command_name = command["name"]
-
-        # Use an empty dictionary if 'args' field is not present in 'command' object
-        arguments = command.get("args", {})
-
-        return command_name, arguments
+        return _extract_command(assistant_reply_json)
     except json.decoder.JSONDecodeError:
         return "Error:", {"message": "Invalid JSON"}
-    # All other errors, return "Error: + error message"
     except Exception as e:
         return "Error:", {"message": str(e)}
+
+
+def _extract_command(assistant_reply_json) -> tuple[str, dict[str, str]]:
+    # Always return an array of commands
+    command = "exec"
+
+    if "act" not in assistant_reply_json:
+        return "Error:", {"message": "Missing 'act' object in JSON"}
+
+    if not isinstance(assistant_reply_json, dict):
+        return (
+            "Error:",
+            {
+                "message": f"The previous message sent was not a dictionary {assistant_reply_json}"
+            },
+        )
+
+    arguments = assistant_reply_json["act"]
+
+    if not isinstance(arguments, list):
+        return "Error:", {"message": "'act' object is not a list"}
+
+    for argument in arguments:
+        if not isinstance(argument, dict):
+            return "Error:", {"message": "'act' object is not a list of dictionaries"}
+
+        if "cmd" not in argument:
+            return "Error:", {"message": "Missing 'cmd' object in JSON"}
+
+    return command, {"cmds": arguments}
 
 
 def execute_command(
@@ -292,10 +316,7 @@ def execute_command(
 
         # Handle non-native commands (e.g. from plugins)
         for command in agent.ai_config.prompt_generator.commands:
-            if (
-                command_name == command.label.lower()
-                or command_name == command.name.lower()
-            ):
+            if command_name in [command.label.lower(), command.name.lower()]:
                 return command.function(**arguments)
 
         raise RuntimeError(

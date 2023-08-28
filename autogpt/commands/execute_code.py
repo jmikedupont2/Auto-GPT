@@ -3,6 +3,9 @@
 COMMAND_CATEGORY = "execute_code"
 COMMAND_CATEGORY_TITLE = "Execute Code"
 
+import contextlib
+import hashlib
+import io
 import os
 import subprocess
 import sys
@@ -25,61 +28,62 @@ TIMEOUT_SECONDS: int = 900
 
 
 @command(
-    "py",
-    "Execute Python <code> by writing it to file: ./<ai-name>/executed_code/<file>, and running the resulting script.",
-    {
+    name="execute_python_code",
+    description="Exec() Python <code> str, return STDOUT,STDERR",
+    parameters={
         "code": {
             "type": "string",
             "description": "The Python code to execute",
             "required": True,
         },
-        "file": {
-            "type": "string",
-            "description": "A name to be given to the python file",
-            "required": True,
-        },
     },
-    aliases=["execute_python_code"],
+    aliases=["exec_python_code", "py"],
 )
-def execute_python_code(code: str, file: str, agent: Agent) -> str:
-    """Create and execute a Python file in a Docker container and return the STDOUT of the
-    executed code. If there is any data that needs to be captured use a print statement
+def execute_python_code(code: str, agent: Agent) -> str:
+    """Execute a string Python <code> using exec() and return the STDOUT output.
 
     Args:
         code (str): The Python code to run
-        file(str): A file name to be given to the Python file
         agent (Agent): The agent that is executing the command
 
     Returns:
         str: The STDOUT captured from the code when it ran
     """
-    ai_name = agent.ai_config.ai_name
-    code_dir = agent.workspace.get_path(Path(ai_name, "executed_code"))
-    os.makedirs(code_dir, exist_ok=True)
+    if we_are_running_in_a_docker_container():
+        logger.debug("Running in a Docker container; executing the code directly...")
+        output = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(output):
+                exec(code)
+            return output.getvalue()
+        except Exception as e:
+            return f"Error: {str(e)}"
+    else:
+        logger.debug("Not running in a Docker container")
 
-    if not file.endswith(".py"):
-        file = file + ".py"
+        ai_name = agent.ai_config.ai_name
+        code_dir = agent.workspace.get_path(Path(ai_name, "executed_code"))
+        os.makedirs(code_dir, exist_ok=True)
 
-    # The `name` arg is not covered by @sanitize_path_arg,
-    # so sanitization must be done here to prevent path traversal.
-    file_path = agent.workspace.get_path(code_dir / file)
-    if not file_path.is_relative_to(code_dir):
-        return (
-            "Error: 'filename' argument resulted in path traversal, operation aborted"
-        )
+        # The `name` arg is not covered by @sanitize_path_arg,
+        # so sanitization must be done here to prevent path traversal.
+        file = hashlib.md5().update(code.encode("utf-8")).hexdigest() + ".py"
+        file_path = agent.workspace.get_path(code_dir / file)
+        if not file_path.is_relative_to(code_dir):
+            return "Error: 'filename' argument resulted in path traversal, operation aborted."
 
-    try:
-        with open(file_path, "w+", encoding="utf-8") as f:
-            f.write(code)
+        try:
+            with open(file_path, "w+", encoding="utf-8") as f:
+                f.write(code)
 
-        return execute_python_file(str(file_path), agent)
-    except Exception as e:
-        return f"Error: {str(e)}"
+            return execute_python_file(str(file_path), agent)
+        except Exception as e:
+            return f"Error: {str(e)}"
 
 
 @command(
-    "pyf",
-    "Execute the Python script at <path> (ending in .py) by running 'python <path>' and return the output.",
+    "execute_python_file",
+    "Exec 'python <path>' (must end in .py), return STDOUT,STDERR",
     {
         "path": {
             "type": "string",
@@ -87,7 +91,7 @@ def execute_python_code(code: str, file: str, agent: Agent) -> str:
             "required": True,
         },
     },
-    aliases=["execute_python_file"],
+    aliases=["pyf", "exec_python_file"],
 )
 @sanitize_path_arg("path")
 def execute_python_file(path: str, agent: Agent) -> str:
@@ -209,8 +213,8 @@ def validate_command(command: str, config: Config) -> bool:
 
 
 @command(
-    "sh",
-    "Executes non-interactive shell command string (<cmd>).",
+    "execute_shell_command",
+    "Exec non-interactive shell cmd string (<cmd>), return STDOUT,STDERR",
     {
         "cmd": {
             "type": "string",
@@ -222,7 +226,7 @@ def validate_command(command: str, config: Config) -> bool:
     disabled_reason="You are not allowed to run local shell commands. To execute"
     " shell commands, EXECUTE_LOCAL_COMMANDS must be set to 'True' "
     "in your config file: .env - do not attempt to bypass the restriction.",
-    aliases=["execute_shell", "exec_shell"],
+    aliases=["sh", "exec_shell"],
 )
 @run_in_workspace
 def execute_shell(cmd: str, agent: Agent) -> str:
@@ -243,6 +247,7 @@ def execute_shell(cmd: str, agent: Agent) -> str:
 
     result = subprocess.run(cmd, capture_output=True, shell=True)
     output = f"STDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"
+    logger.debug(f"output: {output}")
     return output
 
 
@@ -503,8 +508,8 @@ def _exec_cross_platform(command_line: str) -> list[dict]:
 
 
 @command(
-    "ask",
-    "Ask the user a series of questions <qs> and return the responses.",
+    "ask_user",
+    "Ask user a series of questions <qs>.",
     {
         "qs": {
             "type": "list[str]",
@@ -514,7 +519,7 @@ def _exec_cross_platform(command_line: str) -> list[dict]:
     },
     lambda config: not config.continuous_mode,
     "The agent is running in continuous mode.",
-    aliases=["ask_user"],
+    aliases=["ask"],
 )
 def ask_user(qs: list[str], agent: Agent) -> list[str]:
     """Ask the user a series of prompts and return the responses

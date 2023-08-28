@@ -47,8 +47,8 @@ LINKS_TO_RETURN = 20
 
 
 @command(
-    "www",
-    "Browses a website.",
+    "read_website",
+    "Browse website.",
     {
         "url": {
             "type": "string",
@@ -61,7 +61,7 @@ LINKS_TO_RETURN = 20
             "required": True,
         },
     },
-    aliases=["browse", "browse_website"],
+    aliases=["browse", "browse_website", "www"],
 )
 @validate_url
 def browse_website(url: str, question: str, agent: Agent) -> str:

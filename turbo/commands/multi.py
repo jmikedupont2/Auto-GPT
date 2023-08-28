@@ -9,8 +9,8 @@ from autogpt.command_decorator import command
 
 
 @command(
-    "xcmds",
-    "Efficiently execute many commands. Can use <prev_result> to pass command output to the next command, if necessary.",
+    "exec",
+    "Efficiently execute many commands. Can use <prev_output> to pass command output to the next command, if necessary.",
     {
         "cmds": {
             "type": "list[{name: str, args: dict[str, object]}]",
@@ -30,18 +30,16 @@ def execute_commands(cmds: list, agent: Agent) -> str:
         str: Execution results of each command as a numbered list
     """
     results = []
-    prev_result = None
+    prev_output = None
     for item in cmds:
-        command_name = item["name"]
+        command_name = item["cmd"]
         command_args = item["args"]
-        new_command_args = {}
-        for arg in command_args:
-            if prev_result is not None and isinstance(command_args[arg], str):
-                new_command_args[arg] = command_args[arg].replace(
-                    "<prev_result>", str(prev_result)
-                )
-            else:
-                new_command_args[arg] = command_args[arg]
+        new_command_args = {
+            arg: command_args[arg].replace("<prev_output>", str(prev_output))
+            if prev_output is not None and isinstance(command_args[arg], str)
+            else command_args[arg]
+            for arg in command_args
+        }
         result = execute_command(command_name, new_command_args, agent)
 
         if result is None:
@@ -49,9 +47,9 @@ def execute_commands(cmds: list, agent: Agent) -> str:
         else:
             results.append((command_name, result))
 
-        prev_result = result
+        prev_output = result
 
     return "\n##Execution Results:\n" + "\n".join(
-        f"{i}. {command_name} returned: {result}"
+        f"{i}. '{command_name}' returned: {result}"
         for i, (command_name, result) in enumerate(results, 1)
     )

@@ -156,7 +156,8 @@ class AIConfig:
 
         full_prompt_parts.append(
             prompt_generator.generate_prompt_string(
-                additional_constraints=additional_constraints
+                additional_constraints=additional_constraints,
+                short_commands = config.short_commands
             )
         )
 

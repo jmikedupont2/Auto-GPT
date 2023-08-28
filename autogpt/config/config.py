@@ -56,7 +56,6 @@ class Config(SystemSettings, arbitrary_types_allowed=True):
     # Model configuration
     fast_llm: str = "gpt-3.5-turbo"
     smart_llm: str = "gpt-4-0314"
-    return_llm_thoughts: bool = False
     temperature: float = 0
     openai_functions: bool = False
     embedding_model: str = "text-embedding-ada-002"
@@ -85,6 +84,7 @@ class Config(SystemSettings, arbitrary_types_allowed=True):
     allow_downloads: bool = False
     # Shell commands
     shell_command_control: str = "denylist"
+    short_commands: bool = True
     execute_local_commands: bool = False
     shell_denylist: list[str] = Field(default_factory=lambda: ["sudo", "su"])
     shell_allowlist: list[str] = Field(default_factory=list)
@@ -243,13 +243,13 @@ class ConfigBuilder(Configurable[Config]):
             "exit_key": os.getenv("EXIT_KEY"),
             "plain_output": os.getenv("PLAIN_OUTPUT", "False") == "True",
             "shell_command_control": os.getenv("SHELL_COMMAND_CONTROL"),
+            "short_commands": os.getenv("SHORT_COMMANDS", "True") == "True",
             "ai_settings_file": os.getenv("AI_SETTINGS_FILE", AI_SETTINGS_FILE),
             "prompt_settings_file": os.getenv(
                 "PROMPT_SETTINGS_FILE", PROMPT_SETTINGS_FILE
             ),
             "fast_llm": os.getenv("FAST_LLM", os.getenv("FAST_LLM_MODEL")),
             "smart_llm": os.getenv("SMART_LLM", os.getenv("SMART_LLM_MODEL")),
-            "return_llm_thoughts": os.getenv("RETURN_LLM_THOUGHTS", "False") == "True",
             "embedding_model": os.getenv("EMBEDDING_MODEL"),
             "browse_spacy_language_model": os.getenv("BROWSE_SPACY_LANGUAGE_MODEL"),
             "openai_api_key": os.getenv("OPENAI_API_KEY"),
@@ -364,7 +364,7 @@ class ConfigBuilder(Configurable[Config]):
     def load_azure_config(cls, config_file: Path) -> Dict[str, str]:
         """
         Loads the configuration parameters for Azure hosting from the specified file
-          path as a yaml file.
+        path as a yaml file.
 
         Parameters:
             config_file (Path): The path to the config yaml file.

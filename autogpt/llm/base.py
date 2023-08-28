@@ -101,6 +101,8 @@ class ChatSequence:
     def __getitem__(self: TChatSequence, key: slice) -> TChatSequence:
         ...
 
+
+
     def __getitem__(self: TChatSequence, key: int | slice) -> Message | TChatSequence:
         if isinstance(key, slice):
             copy = deepcopy(self)
@@ -124,7 +126,11 @@ class ChatSequence:
 
     def append(self, message: Message):
         return self.messages.append(message)
-
+    
+    def append_once(self, message: Message):
+        if message not in self.messages:
+            return self.messages.append(message)
+        
     def extend(self, messages: list[Message] | ChatSequence):
         return self.messages.extend(messages)
 
@@ -141,7 +147,7 @@ class ChatSequence:
     ) -> TChatSequence:
         from autogpt.llm.providers.openai import OPEN_AI_CHAT_MODELS
 
-        if not model_name in OPEN_AI_CHAT_MODELS:
+        if model_name not in OPEN_AI_CHAT_MODELS:
             raise ValueError(f"Unknown chat model '{model_name}'")
 
         return cls(

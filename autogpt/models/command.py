@@ -44,9 +44,18 @@ class Command:
             return f"Command '{self.name}' is disabled"
         return self.method(*args, **kwargs)
 
-    def __str__(self) -> str:
-        params = [
+    def formatted_parameters(self) -> list[str]:
+        return [
             f"{param.name}: {param.type if param.required else f'Optional[{param.type}]'}"
             for param in self.parameters
         ]
+        
+    def __str__(self) -> str:
+        params = self.formatted_parameters()
         return f"{self.name}: {self.description}, params: ({', '.join(params)})"
+    
+    def short(self) -> str:
+        params = self.formatted_parameters()
+        label = min(self.aliases + [self.name], key=len)
+        return f"{label}: {self.description}, params: ({', '.join(params)})"
+        

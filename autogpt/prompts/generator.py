@@ -118,6 +118,7 @@ class PromptGenerator:
         additional_constraints: list[str] = [],
         additional_resources: list[str] = [],
         additional_best_practices: list[str] = [],
+        short_commands = True
     ) -> str:
         """
         Generate a prompt string based on the constraints, commands, resources,
@@ -133,7 +134,7 @@ class PromptGenerator:
             f"{self._generate_numbered_list(self.constraints + additional_constraints)}\n\n"
             "## Commands\n"
             "You have access to the following commands:\n"
-            f"{self._generate_commands()}\n\n"
+            f"{self._generate_commands(short_commands=short_commands)}\n\n"
             "## Resources\n"
             "You can leverage access to the following resources:\n"
             f"{self._generate_numbered_list(self.resources + additional_resources)}\n\n"
@@ -141,13 +142,13 @@ class PromptGenerator:
             f"{self._generate_numbered_list(self.best_practices + additional_best_practices)}"
         )
 
-    def _generate_commands(self) -> str:
+    def _generate_commands(self, short_commands=True) -> str:
         command_strings = []
         if self.command_registry:
             command_strings += [
-                str(cmd)
+                cmd.short() if short_commands else str(cmd)
                 for cmd in self.command_registry.commands.values()
-                if cmd.enabled
+                if cmd.enabled and cmd.name != "exec"
             ]
 
         # Add commands from plugins etc.

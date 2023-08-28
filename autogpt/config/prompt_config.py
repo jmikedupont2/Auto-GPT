@@ -48,3 +48,4 @@ class PromptConfig:
         self.triggering_prompt = config_params.get(
             "triggering_prompt", DEFAULT_TRIGGERING_PROMPT
         )
+        self.response_format = config_params.get("response_format", None)

@@ -2,6 +2,9 @@ import sys
 from pathlib import Path
 from typing import Optional, Tuple
 
+from turbo.presets.manager import PresetManager
+from turbo.profiler.profiler import start_profiler
+
 from autogpt.agents import Agent
 from autogpt.app.main import construct_main_ai_config, run_interaction_loop
 from autogpt.commands import COMMAND_CATEGORIES
@@ -10,8 +13,6 @@ from autogpt.config.prompt_config import PromptConfig
 from autogpt.memory.vector import get_memory
 from autogpt.models.command_registry import CommandRegistry
 from autogpt.workspace import Workspace
-from turbo.presets.manager import PresetManager
-from turbo.profiler.profiler import start_profiler
 
 PROJECT_DIR = Path().resolve()
 
@@ -24,14 +25,20 @@ def run_specific_agent(
     return None
 
 
-def bootstrap_agent(task: str, continuous_mode: bool) -> Agent:
+def run_task(task: str) -> None:
+    agent = bootstrap_agent(task)
+    run_interaction_loop(agent)
+    return None
+
+
+def bootstrap_agent(task: str, continuous_mode: bool = True) -> Agent:
     prompt_settings_file = PresetManager.load_prompts("turbo")
 
     config = ConfigBuilder.build_config_from_env(workdir=PROJECT_DIR)
     config.prompt_settings_file = prompt_settings_file
     config.debug_mode = True
     config.continuous_mode = continuous_mode
-    config.temperature = 0.2
+    config.temperature = 0
     config.plain_output = True
     command_registry = CommandRegistry.with_command_modules(COMMAND_CATEGORIES, config)
     config.memory_backend = "no_memory"

@@ -14,7 +14,7 @@ from autogpt.logs import logger
 
 @command(
     "done",
-    "Done: Goals are accomplished and there is nothing left to do.",
+    "Done: All goals accomplished.",
     {
         "reason": {
             "type": "string",
@@ -22,7 +22,7 @@ from autogpt.logs import logger
             "required": True,
         }
     },
-    aliases=["goals_accomplished"],
+    aliases=["goals_accomplished", "end"],
 )
 def task_complete(reason: str, agent: Agent) -> NoReturn:
     """

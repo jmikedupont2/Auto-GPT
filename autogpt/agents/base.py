@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING, Any, Literal, Optional
+from agent.Turbo.autogpt.config.prompt_config import PromptConfig
 
 if TYPE_CHECKING:
     from autogpt.config import AIConfig, Config
@@ -223,72 +224,7 @@ class BaseAgent(metaclass=ABCMeta):
 
     # This can be expanded to support multiple types of (inter)actions within an agent
     def response_format_instruction(self, thought_process_id: ThoughtProcessID) -> str:
-        if thought_process_id != "one-shot":
-            raise NotImplementedError(f"Unknown thought process '{thought_process_id}'")
-
-        if self.config.return_llm_thoughts:
-            RESPONSE_FORMAT_WITH_COMMAND = """```ts
-            interface Response {
-                mind: {
-                    /* Thoughts & reasoning */
-                    reflect: string;
-                    /* Long-term plan as short markdown bullet list */
-                    plan: string;
-                };
-                cmd: {
-                    /* Command Name */
-                    name: string;
-                    /* Command Args */
-                    args: Record<string, any>;
-                };
-            }
-            ```"""
-        else:
-            RESPONSE_FORMAT_WITH_COMMAND = """```ts
-            interface Response {
-                mind: {
-                    /* Long-term plan as short markdown bullet list */
-                    plan: string;
-                };
-                cmd: {
-                    /* Command Name */
-                    name: string;
-                    /* Command Args */
-                    args: Record<string, any>;
-                };
-            }
-            ```"""
-
-        RESPONSE_FORMAT_WITHOUT_COMMAND = """```ts
-        interface Response {
-            thoughts: {
-                // Thoughts
-                text: string;
-                reasoning: string;
-                // Short markdown-style bullet list that conveys the long-term plan
-                plan: string;
-                // Constructive self-criticism
-                criticism: string;
-                // Summary of thoughts to say to the user
-                speak: string;
-            };
-        }
-        ```"""
-
-        response_format = re.sub(
-            r"(\n\s+|\n+)",
-            "",
-            RESPONSE_FORMAT_WITHOUT_COMMAND
-            if self.config.openai_functions
-            else RESPONSE_FORMAT_WITH_COMMAND,
-        )
-
-        use_functions = self.config.openai_functions and self.command_registry.commands
-        return (
-            f"Respond strictly with JSON{', and also specify a command to use through a function_call' if use_functions else ''}. "
-            "The JSON should be compatible with the TypeScript type `Response` from the following, with no unnecessary newlines:\n"
-            f"{response_format}"
-        )
+        return PromptConfig(self.config.prompt_settings_file).response_format
 
     def on_before_think(
         self,
@@ -349,9 +285,8 @@ class BaseAgent(metaclass=ABCMeta):
         Returns:
             The parsed command name and command args, if any, and the agent thoughts.
         """
-
         # Save assistant reply to message history
-        self.history.append(prompt[-1])
+        self.history.append_once(prompt[-1])
         self.history.add(
             "assistant", llm_response.content, "ai_response"
         )  # FIXME: support function calls
