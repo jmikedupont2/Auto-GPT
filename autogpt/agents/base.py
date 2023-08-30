@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING, Any, Literal, Optional
-from agent.Turbo.autogpt.config.prompt_config import PromptConfig
+from autogpt.config.prompt_config import PromptConfig
 
 if TYPE_CHECKING:
     from autogpt.config import AIConfig, Config
