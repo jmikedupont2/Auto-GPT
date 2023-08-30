@@ -53,6 +53,15 @@ response_format_1: |
 response_format: |
   Respond strictly with JSON, using the following schema:
   {
+    /* Long term plan: Very clear, numbered steps to fulfill the goals: */
+    "plan": "<string: Long term plan>",
+    /* List of commands to execute: */
+    "act": <list: [{cmd: string; args: Record<string, any>; },...]>
+  }
+
+response_format_1: |
+  Respond strictly with JSON, using the following schema:
+  {
     /* List of commands to execute: */
     "act": <list: [{cmd: string; args: Record<string, any>; },...]>
   }
