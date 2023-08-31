@@ -170,8 +170,8 @@ def read_file(file: str, agent: Agent) -> str:
         file_memory = MemoryItem.from_text_file(content, file, agent.config)
         if len(file_memory.chunks) > 1:
             return file_memory.summary
-
-        return content
+        
+        return f"{Path(file).name} contents:\n" + content
     except Exception as e:
         return f"Error: {str(e)}"
 

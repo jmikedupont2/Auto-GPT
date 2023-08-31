@@ -207,15 +207,12 @@ class Agent(BaseAgent):
                         and self.last_arguments == arguments
                     )
                 ):
-                    logger.error("Duplicate command detected, exiting.")
-                    exit(1)
+                    logger.error("Repeated command. You just executed this command.")
+                    return "Error:", {"message": "Repeated command. You just executed it."}, assistant_reply_dict
+                    
                 else:
                     self.last_command_name = command_name
                     self.last_arguments = arguments
-
-                if "llm_response.content" in self.history.messages:
-                    logger.error("Duplicate response detected, exiting.")
-                    exit(1)
 
                 response = command_name, arguments, assistant_reply_dict
             except Exception as e:
@@ -233,7 +230,7 @@ class Agent(BaseAgent):
 
 def extract_command(
     assistant_reply_json: dict, assistant_reply: ChatModelResponse, config: Config
-) -> tuple[str, dict[str, str]]:
+) -> tuple[str, list[str]]:
     """Parse the response and return the command name and arguments
 
     Args:
@@ -285,25 +282,21 @@ def _extract_command(assistant_reply_json) -> tuple[str, dict[str, str]]:
         return "Error:", {"message": "'act' object is not a list"}
 
     for argument in arguments:
-        if not isinstance(argument, dict):
-            return "Error:", {"message": "'act' object is not a list of dictionaries"}
+        if not isinstance(argument, list):
+            return "Error:", {"message": "'act' object is not a list of lists"}
 
-        if "cmd" not in argument:
-            return "Error:", {"message": "Missing 'cmd' object in JSON"}
-
-    return command, {"cmds": arguments}
-
+    return command, arguments
 
 def execute_command(
     command_name: str,
-    arguments: dict[str, str],
+    arguments: list[str],
     agent: Agent,
 ) -> Any:
     """Execute the command and return the result
 
     Args:
         command_name (str): The name of the command to execute
-        arguments (dict): The arguments for the command
+        arguments (list): The arguments for the command
         agent (Agent): The agent that is executing the command
 
     Returns:
@@ -312,12 +305,12 @@ def execute_command(
     try:
         # Execute a native command with the same name or alias, if it exists
         if command := agent.command_registry.get_command(command_name):
-            return command(**arguments, agent=agent)
+            return command(*arguments, agent=agent)
 
         # Handle non-native commands (e.g. from plugins)
         for command in agent.ai_config.prompt_generator.commands:
             if command_name in [command.label.lower(), command.name.lower()]:
-                return command.function(**arguments)
+                return command.function(*arguments)
 
         raise RuntimeError(
             f"Cannot execute '{command_name}': unknown cmd." " Do not use it again."

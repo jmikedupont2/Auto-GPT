@@ -14,15 +14,21 @@
             "type": "array",
             "description": "list of actions to take",
             "items": {
-                "type": "array",
-                "description": "action to take",
-                "items": {
-                    "oneOf": [
-                        {"type": "string", "description": "command to execute"},
-                        {"type": "object", "description": "argument to pass to command"}
-                    ]
+                "type": "object",
+                "properties": {
+                    "cmd": {
+                        "type": "string",
+                        "description": "command to execute"
+                    },
+                    "args": {
+                        "type": "object",
+                        "description": "arguments to pass to command"
+                    }
                 },
-                "minItems": 1
+                "required": [
+                    "cmd"
+                ],
+                "additionalProperties": true
             },
             "minItems": 1
         }
