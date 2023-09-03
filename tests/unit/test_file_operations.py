@@ -250,7 +250,7 @@ def test_write_file_succeeds_if_content_different(
     result = file_ops.write_to_file(
         str(test_file_with_content_path), new_content, agent=agent
     )
-    assert result == "File written to successfully."
+    assert result == "Successful."
 
 
 def test_append_to_file(test_nested_file: Path, agent: Agent) -> None:

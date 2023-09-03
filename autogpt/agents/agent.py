@@ -166,7 +166,7 @@ class Agent(BaseAgent):
         if result is None:
             self.history.add("system", "Unable to execute command", "action_result")
         else:
-            self.history.add("system", result, "action_result")
+            self.history.add("user", result, "action_result")
 
         return result
 

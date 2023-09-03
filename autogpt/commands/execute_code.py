@@ -10,6 +10,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from colorama import Fore
 
 import docker
 from docker.errors import DockerException, ImageNotFound
@@ -25,6 +26,7 @@ from .decorators import run_in_workspace, sanitize_path_arg
 ALLOWLIST_CONTROL = "allowlist"
 DENYLIST_CONTROL = "denylist"
 TIMEOUT_SECONDS: int = 900
+PAUSE_SECONDS: int = 10
 
 
 @command(
@@ -67,7 +69,9 @@ def execute_python_code(code: str, agent: Agent) -> str:
 
         # The `name` arg is not covered by @sanitize_path_arg,
         # so sanitization must be done here to prevent path traversal.
-        file = hashlib.md5().update(code.encode("utf-8")).hexdigest() + ".py"
+        hash_object = hashlib.md5()
+        hash_object.update(code.encode("utf-8"))
+        file = hash_object.hexdigest() + ".py"
         file_path = agent.workspace.get_path(code_dir / file)
         if not file_path.is_relative_to(code_dir):
             return "Error: 'filename' argument resulted in path traversal, operation aborted."
@@ -505,41 +509,3 @@ def _exec_cross_platform(command_line: str) -> list[dict]:
         )
 
     return conversation
-
-
-@command(
-    "ask_user",
-    "Ask user a series of questions <qs>.",
-    {
-        "qs": {
-            "type": "list[str]",
-            "description": "The questions to ask the user.",
-            "required": True,
-        }
-    },
-    lambda config: not config.continuous_mode,
-    "The agent is running in continuous mode.",
-    aliases=["ask"],
-)
-def ask_user(qs: list[str], agent: Agent) -> list[str]:
-    """Ask the user a series of prompts and return the responses
-
-    Args:
-        qs (list[str]): The prompts to ask the user
-        agent (Agent): The agent that is executing the command
-
-    Returns:
-        list[str]: The responses from the user
-    """
-
-    from inputimeout import TimeoutOccurred, inputimeout
-
-    results = []
-    try:
-        for prompt in qs:
-            response = inputimeout(prompt, timeout=TIMEOUT_SECONDS)
-            results.append(response)
-    except TimeoutOccurred:
-        results.append(f"Timed out after {TIMEOUT_SECONDS} seconds.")
-
-    return results

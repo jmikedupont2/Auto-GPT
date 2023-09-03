@@ -1,1 +1,2 @@
 from agbenchmark.benchmarks import run_specific_agent
+from agbenchmark.benchmarks import bootstrap_agent

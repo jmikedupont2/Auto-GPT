@@ -19,7 +19,8 @@
                 "items": {
                     "oneOf": [
                         {"type": "string", "description": "command to execute"},
-                        {"type": "object", "description": "argument to pass to command"}
+                        {"type": "object", "description": "argument to pass to command"},
+                        {"type": "array", "description": "argument to pass to command"}
                     ]
                 },
                 "minItems": 1

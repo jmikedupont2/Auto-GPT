@@ -239,7 +239,7 @@ def write_to_file(file: str, text: str, agent: Agent) -> str:
         with open(file, "w", encoding="utf-8") as _f:
             _f.write(text)
         log_operation("write", file, agent, checksum)
-        return "Write successful."
+        return "Successful."
     except Exception as err:
         return f"Error: {err}"
 

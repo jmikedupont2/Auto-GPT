@@ -103,7 +103,8 @@ import click
     "--presets",
     "--examples",
     is_flag=True,
-    help="List available preset AI configs.",
+    default=True,
+    help="List available preset AI configs and ask the user to choose one.",
 )
 @click.pass_context
 def main(
@@ -143,10 +144,6 @@ def main(
     # Turbo: skip_news = True
     skip_news = True
 
-    if presets:
-        PresetManager.list()
-        return
-
     if preset:
         ai_settings, prompt_settings = PresetManager.load(preset)
         ai_name = ai_role = ai_goal = None
@@ -182,6 +179,7 @@ def main(
             ai_name=ai_name,
             ai_role=ai_role,
             ai_goals=ai_goal,
+            presets=presets
         )
 
 

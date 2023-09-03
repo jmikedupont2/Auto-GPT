@@ -32,7 +32,7 @@ prompt_toolkit>=3.0.38
 pydantic
 inflection
 agent-protocol>=0.1.1
-inputimeout
+pytimedinput
 sarge
 yappi
 

@@ -1,0 +1,2 @@
+How should the tool handle duplicate file names?
+Answer: Append a number

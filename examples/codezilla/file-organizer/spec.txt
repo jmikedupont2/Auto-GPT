@@ -1,0 +1,45 @@
+1. Project overview
+2. Goals, user stories, features
+3. Step-by-step programmer instructions
+4. Edge cases and error handling
+5. All files, folders, classes, functions, function signatures, interdependencies, patterns, including short comment about each.
+6.Test plan: all cases, components, expected results.
+
+Project overview:
+A file organizer CLI tool in Python that sorts files in a directory based on their file types (e.g., images, documents, audio) and moves them into corresponding folders.
+
+Goals, user stories, features:
+- Support any file type
+- Name folders based on file types
+- Include a --exclude command-line option to exclude specific file types
+- Handle duplicate file names by appending a number
+
+Step-by-step programmer instructions:
+1. Create a Python script (file_organizer.py)
+2. Define a function to identify file types
+3. Define a function to create folders based on file types
+4. Define a function to move files into corresponding folders
+5. Handle command-line options, including --exclude
+6. Handle duplicate file names by appending a number
+7. Test the tool with various file types and scenarios
+
+Edge cases and error handling:
+- Handle invalid directory paths
+- Handle permission issues when moving files
+- Handle unsupported file types gracefully
+
+All files, folders, classes, functions, function signatures, interdependencies, patterns, including short comment about each:
+- file_organizer.py: Main script containing all functions and logic
+  - identify_file_type(file): Identify the file type of a given file
+  - create_folders(file_types): Create folders based on file types
+  - move_files(files, file_types): Move files into corresponding folders
+  - handle_command_line_options(): Parse and handle command-line options
+  - handle_duplicate_file_names(file, destination): Append a number to duplicate file names
+
+Test plan: all cases, components, expected results:
+- Test with various file types and directory structures
+- Test with excluded file types using the --exclude option
+- Test with duplicate file names
+- Test with invalid directory paths
+- Test with permission issues when moving files
+- Test with unsupported file types

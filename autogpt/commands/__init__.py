@@ -1,5 +1,6 @@
 COMMAND_CATEGORIES = [
     "turbo.commands.multi",
+    "turbo.commands.interact",
     "autogpt.commands.execute_code",
     "autogpt.commands.file_operations",
     "autogpt.commands.web_search",

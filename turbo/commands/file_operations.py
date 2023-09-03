@@ -83,7 +83,7 @@ def write_to_file_new(filename: str, text: str, if_exists: str, agent: Agent) ->
         if isinstance(result, str):  # If the result is a string, return it
             return result
 
-        return "File written to successfully."
+        return "Successful."
     except Exception as err:
         return f"Error: {err}"
     finally:

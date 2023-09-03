@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-COMMAND_CATEGORY = "file_operations"
-COMMAND_CATEGORY_TITLE = "File Operations"
+COMMAND_CATEGORY = "system"
+COMMAND_CATEGORY_TITLE = "System"
 from autogpt.agents.agent import Agent, execute_command
 from autogpt.command_decorator import command
 

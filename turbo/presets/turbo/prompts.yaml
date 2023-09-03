@@ -50,5 +50,6 @@ response_format_1: |
 response_format: |
   Strictly use JSON with schema:
   {
-    "act": <list: [<list: [cmd, arg1, arg2, ...]>, ...]>
+    "act": <list: [<list: [cmd, arg1, arg2, ...]>, ...]> /*minitems=1*/
   }
+  No other output is allowed.

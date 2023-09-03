@@ -1,0 +1,40 @@
+Build a Tic-Tac-Toe game using a python CLI. Here are the specifications.
+
+The Grid: The game board is a 3x3 grid, consisting of 3 rows and 3 columns, creating a total of 9 squares.
+
+Players: There are two players. One player uses the number "1", and the other player uses the number "2".
+
+Taking Turns: Players take turns to put their respective numbers ("1" or "2") in an empty square of the grid. Once a player has placed their number in a square, it cannot be changed or removed.
+
+Objective: The goal is to get three of your numbers in a row, either horizontally, vertically, or diagonally.
+
+End of the Game: The game concludes in one of two ways: One player gets three of their numbers in a row (horizontally, vertically, or diagonally) and is declared the winner.
+All squares on the grid are filled, and no player has three in a row. This situation is a "draw" or a "tie".
+
+Technical specifications:
+Build a file called tic_tac_toe.py. This file will be called through command lines. You will have to prompt users for their move. Player 1 will always start.
+Players will input their move in the following format: "x,y" where x and y represent the location in the grid (0,0 is top left, 2,2 is bottom right).
+
+Your primary requirement is to halt the game when appropriate and to print only one of these three exact sentences:
+
+"Player 1 won!"
+"Player 2 won!"
+"Draw"
+
+Edge cases: A player can send an incorrect location. Either the location is incorrect or the square is already filled. In this case, this counts as doing nothing, and the player gets prompted for new locations again.
+
+
+You will be expected to create a python file called tic_tac_toe.py that will run through command lines by using python tic_tac_toe.py.
+
+Here is an example of how your tic_tac_toe.py game will be tested.
+
+process = subprocess.Popen(
+    ['python', 'tic_tac_toe.py'],
+    stdout=subprocess.PIPE,
+    text=True
+)
+
+output, _ = process.communicate('
+'.join(["0,0", "1,0", "0,1", "1,1", "0,2"]))
+
+assert "Player 1 won!" in output

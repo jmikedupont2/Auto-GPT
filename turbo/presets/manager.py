@@ -1,12 +1,12 @@
 from pathlib import Path
 
-from colorama import Fore
+from colorama import Fore, Style
 
 from autogpt.logs import logger
 
 SETTINGS_FILE = "ai.yaml"
 PROMPTS_FILE = "prompts.yaml"
-
+from autogpt.app.utils import clean_input
 
 class PresetManager:
     _presets = None
@@ -22,6 +22,7 @@ class PresetManager:
                 + [file.parent.relative_to(my_dir) for file in prompt_files]
             )
             cls._presets = [".".join(dir.parts) for dir in dirs]
+            cls._presets.sort()
         return cls._presets
 
     @classmethod
@@ -39,10 +40,36 @@ class PresetManager:
             logger.typewriter_log(f"  [{i}] - {preset}", Fore.CYAN)
 
     @classmethod
+    def prompt_user(cls, config) -> None:
+        cls.list()
+        logger.typewriter_log("\n")
+        preset = clean_input(
+            config, 
+            f"{Fore.CYAN}Enter the number of the preset you want to use, or press Enter to skip: ", 
+            talk=False
+        )
+
+        if preset:
+            try:
+                preset = int(preset)
+                if preset > 0 and preset <= len(cls.get_all()):
+                    preset_name = cls.get_all()[preset - 1]
+                    logger.typewriter_log(
+                        f"Loading preset '{preset_name}'.", Fore.CYAN
+                    )
+                    return cls.load(preset_name)
+            except ValueError:
+                logger.typewriter_log(
+                    f"Preset '{preset}' not found. Skiping...",
+                    Fore.RED,
+                )
+        return None, None
+    
+    @classmethod
     def validate(cls, preset_name: str) -> bool:
         if preset_name not in cls.get_all():
             logger.typewriter_log(
-                f"Profile '{preset_name}' not found. Use '--presets' to see available presets.",
+                f"Preset '{preset_name}' not found. Use '--presets' to see available presets.",
                 Fore.RED,
             )
             return False
