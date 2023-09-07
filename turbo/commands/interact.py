@@ -21,7 +21,7 @@ from autogpt.command_decorator import command
 from autogpt.config import Config
 from autogpt.logs import logger
 
-from .decorators import run_in_workspace, sanitize_path_arg
+from autogpt.commands.decorators import run_in_workspace, sanitize_path_arg
 
 TIMEOUT_SECONDS: int = 900
 PAUSE_SECONDS: int = 10

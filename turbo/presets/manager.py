@@ -93,10 +93,31 @@ class PresetManager:
                     f"Preset '{preset_name}' does not have ai settings.",
                     Fore.YELLOW,
                 )
-
+                
             prompt_settings = cls.load_prompts(preset_name)
+            cls.display_intro(preset_name)
             return ai_settings, prompt_settings
         return None, None
+    
+    @classmethod
+    def display_intro(cls, preset_name: str) -> None | str:
+        intro_file = Path(__file__).parent / preset_name.replace(".", "/") / "intro.md"
+            
+        if intro_file.exists():
+            intro = intro_file.read_text()
+                
+        from pytimedinput import timedKey
+
+        intro = (
+            f"{Fore.CYAN}"
+            "\n================================================================\n"
+            f"{intro}"
+            "\n================================================================\n"
+            "Press any key to continue..."
+            "\n================================================================\n"
+        )
+        timedKey(prompt=intro, resetOnInput=False, timeout=10)
+        
 
     @classmethod
     def load_prompts(cls, preset_name: str) -> None | str:

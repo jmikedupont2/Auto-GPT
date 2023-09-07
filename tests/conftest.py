@@ -38,7 +38,7 @@ def workspace(workspace_root: Path) -> Workspace:
 def temp_plugins_config_file() -> Generator:
     """Create a plugins_config.yaml file in a temp directory so that it doesn't mess with existing ones"""
     config_directory = TemporaryDirectory()
-    config_file = os.path.join(config_directory.name, "plugins_config.yaml")
+    config_file = os.path.join(config_directory.name, config, "plugins_config.yaml")
     with open(config_file, "w+") as f:
         f.write(yaml.dump({}))
 

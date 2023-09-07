@@ -33,6 +33,7 @@ develop-eggs/
 dist/
 /plugins/
 plugins_config.yaml
+config/plugins_config.yaml
 downloads/
 eggs/
 .eggs/

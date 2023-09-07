@@ -239,7 +239,7 @@ def scan_plugins(config: Config, debug: bool = False) -> List[AutoGPTPluginTempl
 
         if not plugins_config.is_enabled(plugin_module_name):
             logger.warn(
-                f"Plugin folder {plugin_module_name} found but not configured. If this is a legitimate plugin, please add it to plugins_config.yaml (key: {plugin_module_name})."
+                f"Plugin folder {plugin_module_name} found but not configured. If this is a legitimate plugin, please add it to config/plugins_config.yaml (key: {plugin_module_name})."
             )
             continue
 
@@ -281,16 +281,16 @@ def scan_plugins(config: Config, debug: bool = False) -> List[AutoGPTPluginTempl
 
                         if plugin_configured and plugin_enabled:
                             logger.debug(
-                                f"Loading plugin {plugin_name}. Enabled in plugins_config.yaml."
+                                f"Loading plugin {plugin_name}. Enabled in config/plugins_config.yaml."
                             )
                             loaded_plugins.append(a_module())
                         elif plugin_configured and not plugin_enabled:
                             logger.debug(
-                                f"Not loading plugin {plugin_name}. Disabled in plugins_config.yaml."
+                                f"Not loading plugin {plugin_name}. Disabled in config/plugins_config.yaml."
                             )
                         elif not plugin_configured:
                             logger.warn(
-                                f"Not loading plugin {plugin_name}. Key '{plugin_name}' was not found in plugins_config.yaml. "
+                                f"Not loading plugin {plugin_name}. Key '{plugin_name}' was not found in config/plugins_config.yaml. "
                                 f"Zipped plugins should use the class name ({plugin_name}) as the key."
                             )
                     else:
