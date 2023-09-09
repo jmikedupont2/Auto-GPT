@@ -35,6 +35,7 @@ agent-protocol>=0.1.1
 pytimedinput
 sarge
 yappi
+scalene
 
 # web server
 fastapi

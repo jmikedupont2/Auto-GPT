@@ -114,6 +114,13 @@ def execute_python_file(path: str, agent: Agent) -> str:
 
     if not path.endswith(".py"):
         return "Error: Invalid file type. Only .py files are allowed."
+    
+    # If we're in continuous mode, check that the file doesn't contain interactive commands
+    if agent.config.continuous_mode:
+        with open(path, "r") as f:
+            file_contents = f.read()
+        if "input(" in file_contents:
+            return f"Error: {path} contains interactive commands. The current automated execution mode cannot accept user inputs. Try another command."
 
     file_path = Path(path)
     if not file_path.is_file():

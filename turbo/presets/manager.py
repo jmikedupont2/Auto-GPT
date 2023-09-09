@@ -1,12 +1,13 @@
 from pathlib import Path
 
-from colorama import Fore, Style
+from colorama import Fore
 
+from autogpt.app.utils import clean_input
 from autogpt.logs import logger
 
 SETTINGS_FILE = "ai.yaml"
 PROMPTS_FILE = "prompts.yaml"
-from autogpt.app.utils import clean_input
+PRESETS_DIR = Path(__file__).parent.parent.parent / "config" / "presets"
 
 class PresetManager:
     _presets = None
@@ -14,12 +15,11 @@ class PresetManager:
     @classmethod
     def get_all(cls) -> list[str]:
         if cls._presets is None:
-            my_dir = Path(__file__).parent
-            ai_files = my_dir.glob(f"**/{SETTINGS_FILE}")
-            prompt_files = my_dir.glob(f"**/{PROMPTS_FILE}")
+            ai_files = PRESETS_DIR.glob(f"**/{SETTINGS_FILE}")
+            prompt_files = PRESETS_DIR.glob(f"**/{PROMPTS_FILE}")
             dirs = set(
-                [file.parent.relative_to(my_dir) for file in ai_files]
-                + [file.parent.relative_to(my_dir) for file in prompt_files]
+                [file.parent.relative_to(PRESETS_DIR) for file in ai_files]
+                + [file.parent.relative_to(PRESETS_DIR) for file in prompt_files]
             )
             cls._presets = [".".join(dir.parts) for dir in dirs]
             cls._presets.sort()
@@ -44,9 +44,9 @@ class PresetManager:
         cls.list()
         logger.typewriter_log("\n")
         preset = clean_input(
-            config, 
-            f"{Fore.CYAN}Enter the number of the preset you want to use, or press Enter to skip: ", 
-            talk=False
+            config,
+            f"{Fore.CYAN}Enter the number of the preset you want to use, or press Enter to skip: ",
+            talk=False,
         )
 
         if preset:
@@ -54,9 +54,7 @@ class PresetManager:
                 preset = int(preset)
                 if preset > 0 and preset <= len(cls.get_all()):
                     preset_name = cls.get_all()[preset - 1]
-                    logger.typewriter_log(
-                        f"Loading preset '{preset_name}'.", Fore.CYAN
-                    )
+                    logger.typewriter_log(f"Loading preset '{preset_name}'.", Fore.CYAN)
                     return cls.load(preset_name)
             except ValueError:
                 logger.typewriter_log(
@@ -64,7 +62,7 @@ class PresetManager:
                     Fore.RED,
                 )
         return None, None
-    
+
     @classmethod
     def validate(cls, preset_name: str) -> bool:
         if preset_name not in cls.get_all():
@@ -93,19 +91,19 @@ class PresetManager:
                     f"Preset '{preset_name}' does not have ai settings.",
                     Fore.YELLOW,
                 )
-                
+
             prompt_settings = cls.load_prompts(preset_name)
             cls.display_intro(preset_name)
             return ai_settings, prompt_settings
         return None, None
-    
+
     @classmethod
     def display_intro(cls, preset_name: str) -> None | str:
         intro_file = Path(__file__).parent / preset_name.replace(".", "/") / "intro.md"
-            
+
         if intro_file.exists():
             intro = intro_file.read_text()
-                
+
         from pytimedinput import timedKey
 
         intro = (
@@ -117,7 +115,6 @@ class PresetManager:
             "\n================================================================\n"
         )
         timedKey(prompt=intro, resetOnInput=False, timeout=10)
-        
 
     @classmethod
     def load_prompts(cls, preset_name: str) -> None | str:

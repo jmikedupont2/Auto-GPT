@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import os
-
+from autogpt.agents.agent import Agent
+from autogpt.command_decorator import command
 from autogpt.commands.decorators import sanitize_path_arg
 from autogpt.commands.file_operations import (
     is_duplicate_operation,
@@ -13,9 +14,6 @@ from autogpt.commands.file_operations import (
 
 COMMAND_CATEGORY = "file_operations"
 COMMAND_CATEGORY_TITLE = "File Operations"
-from autogpt.agents.agent import Agent
-from autogpt.command_decorator import command
-
 
 @command(
     "write_to_file",
@@ -37,6 +35,7 @@ from autogpt.command_decorator import command
             "required": True,
         },
     },
+    enabled=False,
     aliases=["write_file", "create_file"],
 )
 @sanitize_path_arg("filename")

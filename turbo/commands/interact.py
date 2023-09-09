@@ -1,28 +1,13 @@
 """Commands to execute code"""
 
-COMMAND_CATEGORY = "system"
-COMMAND_CATEGORY_TITLE = "System"
-
-import contextlib
-import hashlib
-import io
-import os
-import subprocess
-import sys
-from pathlib import Path
 from colorama import Fore
-
-import docker
-from docker.errors import DockerException, ImageNotFound
-from docker.models.containers import Container as DockerContainer
-
 from autogpt.agents.agent import Agent
 from autogpt.command_decorator import command
-from autogpt.config import Config
-from autogpt.logs import logger
 
 from autogpt.commands.decorators import run_in_workspace, sanitize_path_arg
 
+COMMAND_CATEGORY = "system"
+COMMAND_CATEGORY_TITLE = "System"
 TIMEOUT_SECONDS: int = 900
 PAUSE_SECONDS: int = 10
 
@@ -36,6 +21,7 @@ PAUSE_SECONDS: int = 10
             "required": True,
         }
     },
+    enabled=lambda config: not config.continuous_mode,
     aliases=["ask_user"],
 )
 def ask_user(qs: list[str], agent: Agent) -> list[str]:
@@ -76,6 +62,7 @@ def ask_user(qs: list[str], agent: Agent) -> list[str]:
             "required": True,
         }
     },
+    enabled=lambda config: not config.continuous_mode,
     aliases=["tell_user"],
 )
 def tell(text: str, agent: Agent) -> str:

@@ -1,6 +1,34 @@
-# Turbo
+# What's Turbo
 
-Turbo is the high-octane testing ground for experimental Auto-GPT features. Will these next-gen innovations race into Auto-GPT's lineup or get left in the dust?
+Turbo's an Auto-GTP v0.4.7 fork that adds various enhancements.
+
+The current enhancements are focused on:
+
+1/ Making GPT-4 faster & cheaper
+
+GPT-4 is way more powerful than 3.5-turbo. Fewer loops, fewer JSON formating errors, more complex tasks, name it - But, it's also 10X pricier, and no where near as fast.
+
+Turbo is 3X cheaper and 2X faster than the default Auto-GPT 0.4.7.
+
+2/ Making Auto-GPT's prompts more accessible
+
+It's astounding how much LLM behavior and agent performance can vary with different prompts. Turbo aims to make it easy for anyone to tweak Auto-GPT's prompts, and also comes with a growing library of pre-defined prompts for various tasks (aka personas or presets). 
+
+3/ Making Auto-GPT mult-agent interactions more composable
+
+Auto-GPT has more than oen inbuilt agents like a planner and executor, and more to come.
+
+Turbo allows you to define any number of agents, and define their tasks, personas and roles. You can enable inter-agent communication, and can also allow Turbo agents to spin up other agents by replicating themselves or loading any of the preset agents.
+
+
+
+ the cost of using GPT-4 3X over the default Auto-GPT 0.4.7, and is about 2X faster than the default Auto-GPT 0.4.7 (benchmark data coming soon)
+Can we make it faster & cheaper? two go hand in hand. GPT-4's speed is greatly affected by the number of output tokens (input tokens do not affect speed as much)
+
+2- GPT-4 (Currently, )
+3- Lower cost for GPT-4
+
+is the high-octane testing ground for experimental Auto-GPT features. Will these next-gen innovations race into Auto-GPT's lineup or get left in the dust?
 
 [ [Setup Auto-GPT-Turbo](/turbo/docs/setup.md) | [Presets](/turbo/docs/presets.md) ]
 
