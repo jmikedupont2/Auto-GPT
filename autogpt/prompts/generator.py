@@ -24,9 +24,9 @@ class PromptGenerator:
         def __str__(self) -> str:
             """Returns a string representation of the command."""
             params_string = ", ".join(
-                f'"{key}": "{value}"' for key, value in self.params.items()
+                f"{key}: {value}" for key, value in self.params.items()
             )
-            return f'{self.label}: "{self.name}", params: ({params_string})'
+            return f"{self.label}: {self.name}, params: ({params_string})"
 
     constraints: list[str]
     commands: list[Command]
@@ -56,6 +56,7 @@ class PromptGenerator:
         command_name: str,
         params: dict[str, str] = {},
         function: Optional[Callable] = None,
+        aliases: list[str] = [],
     ) -> None:
         """
         Add a command to the commands list with a label, name, and optional arguments.
@@ -118,7 +119,7 @@ class PromptGenerator:
         additional_constraints: list[str] = [],
         additional_resources: list[str] = [],
         additional_best_practices: list[str] = [],
-        short_commands = True
+        short_commands=True,
     ) -> str:
         """
         Generate a prompt string based on the constraints, commands, resources,

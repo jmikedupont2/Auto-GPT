@@ -120,10 +120,16 @@ Latest Development:
                 ), "AI response is not a valid JSON object"
                 assert result_message.type == "action_result"
 
+                if user_message.type == "action_result":
+                    # If the user message is also an action result, then it means we didn't store the prompt
+                    # because it was a generic repeated prompt. In this case, we don't want to yield the user message.
+
+                    yield None, ai_message, user_message
                 yield user_message, ai_message, result_message
             except AssertionError as err:
                 logger.debug(
-                    f"Invalid item in message history: {err}; Messages: {messages[i-1:j]}"
+                    f"Invalid item in message history: {err}; Messages:"
+                    f" {messages[i-1:j]}"
                 )
 
     def summary_message(self) -> Message:

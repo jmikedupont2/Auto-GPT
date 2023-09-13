@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from copy import deepcopy
 from dataclasses import dataclass, field
 from math import ceil, floor
@@ -38,6 +39,7 @@ class Message:
     role: MessageRole
     content: str
     type: MessageType | None = None
+    timestamp: float = field(default_factory=lambda: time.time())
 
     def raw(self) -> MessageDict:
         return {"role": self.role, "content": self.content}
@@ -101,8 +103,6 @@ class ChatSequence:
     def __getitem__(self: TChatSequence, key: slice) -> TChatSequence:
         ...
 
-
-
     def __getitem__(self: TChatSequence, key: int | slice) -> Message | TChatSequence:
         if isinstance(key, slice):
             copy = deepcopy(self)
@@ -126,11 +126,11 @@ class ChatSequence:
 
     def append(self, message: Message):
         return self.messages.append(message)
-    
+
     def append_once(self, message: Message):
         if message not in self.messages:
             return self.messages.append(message)
-        
+
     def extend(self, messages: list[Message] | ChatSequence):
         return self.messages.extend(messages)
 
@@ -161,7 +161,7 @@ class ChatSequence:
         return count_message_tokens(self.messages, self.model.name)
 
     def raw(self) -> list[MessageDict]:
-        return [m.raw() for m in self.messages]
+        return [m.raw() for m in self.messages if m is not None and m.content != ""]
 
     def dump(self) -> str:
         SEPARATOR_LENGTH = 42

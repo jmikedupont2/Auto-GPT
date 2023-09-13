@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import re
 from abc import ABCMeta, abstractmethod
 from typing import TYPE_CHECKING, Any, Literal, Optional
+
 from autogpt.config.prompt_config import PromptConfig
 
 if TYPE_CHECKING:
@@ -207,9 +207,9 @@ class BaseAgent(metaclass=ABCMeta):
 
         append_messages: list[Message] = []
 
-        response_format_instr = self.response_format_instruction(thought_process_id)
-        if response_format_instr:
-            append_messages.append(Message("system", response_format_instr))
+        # response_format_instr = self.response_format_instruction(thought_process_id)
+        # if response_format_instr:
+        #    append_messages.append(Message("user", response_format_instr))
 
         prompt = self.construct_base_prompt(
             thought_process_id,
@@ -219,6 +219,10 @@ class BaseAgent(metaclass=ABCMeta):
 
         # ADD user input message ("triggering prompt")
         prompt.append(cycle_instruction_msg)
+
+        response_format_instr = self.response_format_instruction(thought_process_id)
+        if response_format_instr:
+            prompt.append(Message("user", response_format_instr))
 
         return prompt
 

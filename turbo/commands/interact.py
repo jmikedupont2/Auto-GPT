@@ -62,7 +62,8 @@ def ask_user(qs: list[str], agent: Agent) -> list[str]:
             "required": True,
         }
     },
-    enabled=lambda config: not config.continuous_mode,
+    # enabled=lambda config: not config.continuous_mode,
+    enabled=False,
     aliases=["tell_user"],
 )
 def tell(text: str, agent: Agent) -> str:

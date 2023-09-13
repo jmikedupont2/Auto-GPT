@@ -54,7 +54,7 @@ def run_auto_gpt(
     ai_name: Optional[str] = None,
     ai_role: Optional[str] = None,
     ai_goals: Optional[tuple[str]] = None,
-    presets: bool = False,
+    personas: bool = False,
 ) -> None:
     # Configure logging before we do anything else.
     logger.set_level(logging.DEBUG if debug else logging.INFO)
@@ -84,15 +84,19 @@ def run_auto_gpt(
         allow_downloads,
         skip_news,
     )
-    
-    if presets:
-        from turbo.presets import PresetManager
-        ai_preset, prompt_preset = PresetManager.prompt_user(config)
-        ai_settings = ai_preset or ai_settings
-        prompt_settings = prompt_preset or prompt_settings
-        
-        if config.ai_settings_file != ai_settings or config.prompt_settings_file != prompt_settings:
-            # Re-create config with new presets
+
+    if personas:
+        from turbo.personas import PersonaManager
+
+        persona_settings, persona_prompts = PersonaManager.prompt_user(config)
+        ai_settings = persona_settings or ai_settings
+        prompt_settings = persona_prompts or prompt_settings
+
+        if (
+            config.ai_settings_file != ai_settings
+            or config.prompt_settings_file != prompt_settings
+        ):
+            # Re-create config with new personas
             create_config(
                 config,
                 continuous,
@@ -109,9 +113,7 @@ def run_auto_gpt(
                 allow_downloads,
                 skip_news,
             )
-            
-        
-        
+
     if config.continuous_mode:
         for line in get_legal_warning().split("\n"):
             logger.warn(markdown_to_ansi_style(line), "LEGAL:", Fore.RED)
@@ -394,7 +396,7 @@ def update_user(
         logger.typewriter_log(
             "NO ACTION SELECTED: ",
             Fore.RED,
-            f"The Agent failed to select an action.",
+            "The Agent failed to select an action.",
         )
 
 

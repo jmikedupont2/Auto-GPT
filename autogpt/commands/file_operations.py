@@ -149,9 +149,7 @@ def log_operation(
             "required": True,
         }
     },
-    aliases=[
-        "read", "read_file", "cat"
-    ],
+    aliases=["read", "read_file", "cat"],
 )
 @sanitize_path_arg("file")
 def read_file(file: str, agent: Agent) -> str:
@@ -170,7 +168,7 @@ def read_file(file: str, agent: Agent) -> str:
         file_memory = MemoryItem.from_text_file(content, file, agent.config)
         if len(file_memory.chunks) > 1:
             return file_memory.summary
-        
+
         return f"{Path(file).name} contents:\n" + content
     except Exception as e:
         return f"Error: {str(e)}"
@@ -204,7 +202,7 @@ def ingest_file(
 
 @command(
     "write_file",
-    "Overwrite <file> with <text>.",
+    "Write <text> to <file>. Caution: Overwrites existing data!",
     {
         "file": {
             "type": "string",

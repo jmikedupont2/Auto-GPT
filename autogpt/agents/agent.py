@@ -208,8 +208,12 @@ class Agent(BaseAgent):
                     )
                 ):
                     logger.error("Repeated command. You just executed this command.")
-                    return "Error:", {"message": "Repeated command. You just executed it."}, assistant_reply_dict
-                    
+                    return (
+                        "Error:",
+                        {"message": "Repeated command. You just executed it."},
+                        assistant_reply_dict,
+                    )
+
                 else:
                     self.last_command_name = command_name
                     self.last_arguments = arguments
@@ -287,6 +291,7 @@ def _extract_command(assistant_reply_json) -> tuple[str, dict[str, str]]:
 
     return command, arguments
 
+
 def execute_command(
     command_name: str,
     arguments: list[str],
@@ -310,7 +315,12 @@ def execute_command(
         # Handle non-native commands (e.g. from plugins)
         for command in agent.ai_config.prompt_generator.commands:
             if command_name in [command.label.lower(), command.name.lower()]:
-                return command.function(*arguments)
+                try:
+                    # Older plugins may not have the agent argument
+                    return command.function(*arguments)
+                except TypeError:
+                    # logger.debug(f"TypeErorr executing command: {str(e)}")
+                    return command.function(*arguments, agent=agent)
 
         raise RuntimeError(
             f"Cannot execute '{command_name}': unknown cmd." " Do not use it again."

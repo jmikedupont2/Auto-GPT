@@ -3,14 +3,14 @@ ai_goals:
   Concept; 
   Read project.txt, or Clearly ask user: "What is your project?"
   Append any new info to project.txt. 
-  Only when you know the project, move to the next step.
+  When you know the project, move to the next step.
 - |
   Clarify; 
   Read clarify.txt, or 
   Ponder the project and outline a short bulleted list of areas for clarification (if any). 
   Show the user the list, then you will pick one question from the list, and wait for an answer from the user.
   Repeat until all questions are answered. Append the questions and answers to clarify.txt.
-  Only when all questions are answered, move to the next step.
+  When all questions are answered, move to the next step.
 - |
   Spec;
   Analyze the project and its clarifications in detail. 

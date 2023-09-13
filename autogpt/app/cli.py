@@ -88,23 +88,23 @@ import click
     help="AI goal override; may be used multiple times to pass multiple goals.",
 )
 @click.option(
+    "--persona",
     "--preset",
-    "--example",
     type=str,
-    help="Load a preset AI config.",
+    help="Load peset AI config Persona.",
 )
 @click.option(
-    "--inherit-preset",
-    "--inherit-example",
+    "--persona-prompts-only",
+    "--preset-prompts-only",
     type=str,
-    help="Load a preset AI config, while enabling you to set your own AI name, role, and goals.",
+    help="Load preset prompts, while enabling you to set your own AI name, role, and goals.",
 )
 @click.option(
+    "--personas",
     "--presets",
-    "--examples",
     is_flag=True,
     default=True,
-    help="List available preset AI configs and ask the user to choose one.",
+    help="List available AI config Personas and ask the user to choose one.",
 )
 @click.pass_context
 def main(
@@ -127,9 +127,9 @@ def main(
     ai_name: Optional[str],
     ai_role: Optional[str],
     ai_goal: Optional[tuple[str]],
-    preset: Optional[str],
-    inherit_preset: Optional[str],
-    presets: bool,
+    persona: Optional[str],
+    persona_prompts_only: Optional[str],
+    personas: bool,
 ) -> None:
     """
     Welcome to AutoGPT an experimental open-source application showcasing the capabilities of the GPT-4 pushing the boundaries of AI.
@@ -137,24 +137,25 @@ def main(
     Start an Auto-GPT assistant.
     """
     # Put imports inside function to avoid importing everything when starting the CLI
-    from turbo.presets import PresetManager
-
     from autogpt.app.main import run_auto_gpt
+    from turbo.personas import PersonaManager
 
     # Turbo: skip_news = True
     skip_news = True
 
-    if preset:
-        ai_settings, prompt_settings = PresetManager.load(preset)
+    if persona:
+        ai_settings, prompt_settings = PersonaManager.load(persona)
         ai_name = ai_role = ai_goal = None
         skip_reprompt = True
 
-    if inherit_preset:
-        prompt_settings = PresetManager.load_prompts(inherit_preset)
+    elif persona_prompts_only:
+        prompt_settings = PersonaManager.load_prompts(persona_prompts_only)
 
     # Default to turbo prompts
-    if not (preset or inherit_preset or prompt_settings):
-        prompt_settings = PresetManager.load_prompts("turbo")
+    if not (persona or persona_prompts_only or prompt_settings):
+        prompt_settings = PersonaManager.load_prompts("turbo")
+    else:
+        personas = False  # Don't prompt for personas if we've selected one
 
     if ctx.invoked_subcommand is None:
         run_auto_gpt(
@@ -179,7 +180,7 @@ def main(
             ai_name=ai_name,
             ai_role=ai_role,
             ai_goals=ai_goal,
-            presets=presets
+            personas=personas,
         )
 
 

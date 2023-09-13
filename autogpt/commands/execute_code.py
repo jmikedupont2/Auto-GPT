@@ -10,7 +10,6 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-from colorama import Fore
 
 import docker
 from docker.errors import DockerException, ImageNotFound
@@ -114,7 +113,7 @@ def execute_python_file(path: str, agent: Agent) -> str:
 
     if not path.endswith(".py"):
         return "Error: Invalid file type. Only .py files are allowed."
-    
+
     # If we're in continuous mode, check that the file doesn't contain interactive commands
     if agent.config.continuous_mode:
         with open(path, "r") as f:
@@ -278,7 +277,7 @@ def execute_shell(cmd: str, agent: Agent) -> str:
     "in your config. Do not attempt to bypass the restriction.",
 )
 @run_in_workspace
-def execute_shell_popen(command_line, agent: Agent) -> str:
+def execute_shell_popen(command_line: str, agent: Agent) -> str:
     """Execute a shell command with Popen and returns an english description
     of the event and the process id
 
