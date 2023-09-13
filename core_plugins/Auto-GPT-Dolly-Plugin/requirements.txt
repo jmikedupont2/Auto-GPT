@@ -1,0 +1,13 @@
+black
+isort
+flake8
+pylint
+abstract-singleton
+wheel
+setuptools
+build
+twine
+auto-gpt-plugin-template @ git+https://github.com/Significant-Gravitas/Auto-GPT-Plugin-Template@0.1.0
+
+# Testing
+pytest
