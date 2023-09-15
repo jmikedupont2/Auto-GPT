@@ -105,6 +105,7 @@ class Config(SystemSettings, arbitrary_types_allowed=True):
     # Plugin Settings #
     ###################
     plugins_dir: str = "plugins"
+    core_plugins_dir: str = "core_plugins"
     plugins_config_file: str = PLUGINS_CONFIG_FILE
     plugins_config: PluginsConfig = Field(
         default_factory=lambda: PluginsConfig(plugins={})
@@ -284,6 +285,7 @@ class ConfigBuilder(Configurable[Config]):
             "redis_password": os.getenv("REDIS_PASSWORD"),
             "wipe_redis_on_start": os.getenv("WIPE_REDIS_ON_START", "True") == "True",
             "plugins_dir": os.getenv("PLUGINS_DIR"),
+            "core_plugins_dir": os.getenv("CORE_PLUGINS_DIR"),
             "plugins_config_file": os.getenv(
                 "PLUGINS_CONFIG_FILE", PLUGINS_CONFIG_FILE
             ),

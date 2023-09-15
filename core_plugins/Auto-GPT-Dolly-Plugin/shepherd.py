@@ -14,29 +14,76 @@ class Shepherd:
     @classmethod
     def clone_agent(cls, goals: list[str], agent: Agent) -> str:
         new_name = f"{agent.ai_config.ai_name}-c[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]"
-        return cls.create_agent(
+        return cls._create_agent(
             name=new_name,
-            role=agent.ai_config.ai_role,
+            role_backstory_traits=agent.ai_config.ai_role,
             goals=goals,
-            backstory="",
-            persona="",
-            personality="",
+            continuous=agent.ai_config.continuous,
             agent=agent,
         )
 
     @classmethod
-    def create_agent(
+    def create_bg_agent(
         cls,
         name: str,
-        role: str,
+        role_backstory_traits: str,
         goals: list[str],
-        backstory: str,
-        persona: str,
-        personality: str,
         agent: Agent,
     ) -> str:
-        if persona:
-            ai_settings_file, prompt_settings_file = PersonaManager.load(persona)
+        return cls._create_agent(
+            name=name,
+            role_backstory_traits=role_backstory_traits,
+            goals=goals,
+            continuous=True,
+            agent=agent,
+        )
+
+    @classmethod
+    def create_bg_agent_from_persona(cls, persona: str, agent: Agent) -> str:
+        return cls._create_agent(
+            name=persona,
+            continuous=True,
+            agent=agent,
+        )
+
+    @classmethod
+    def create_interactive_agent(
+        cls,
+        name: str,
+        role_backstory_traits: str,
+        goals: list[str],
+        agent: Agent,
+    ) -> str:
+        return cls._create_agent(
+            name=name,
+            role_backstory_traits=role_backstory_traits,
+            goals=goals,
+            continuous=False,
+            agent=agent,
+        )
+
+    @classmethod
+    def _create_agent(
+        cls,
+        name: str,
+        role_backstory_traits: str = [],
+        goals: list[str] = [],
+        personality: str = "",
+        continuous: bool = False,
+        agent: Agent = None,
+    ) -> str:
+        if agent is None:
+            raise ValueError("Agent must be provided.")
+
+        if name and name.lower() in PersonaManager.get_all():
+            ai_settings_file, prompt_settings_file = PersonaManager.load(name.lower())
+        elif (
+            role_backstory_traits
+            and role_backstory_traits.lower() in PersonaManager.get_all()
+        ):
+            ai_settings_file, prompt_settings_file = PersonaManager.load(
+                role_backstory_traits.lower()
+            )
         else:
             ai_settings_file = agent.config.ai_settings_file
             prompt_settings_file = agent.config.prompt_settings_file
@@ -44,7 +91,7 @@ class Shepherd:
         config = deepcopy(agent.config)
         create_config(
             config=config,
-            continuous=config.continuous_mode,
+            continuous=continuous,
             continuous_limit=config.continuous_limit,
             ai_settings_file=ai_settings_file,
             prompt_settings_file=prompt_settings_file,
@@ -63,16 +110,14 @@ class Shepherd:
             skip_news=config.skip_news,
         )
 
-        # only combine role, backstory and personality if they are not empty
-        if backstory:
-            role = ", ".join([role, backstory])
+        # only combine role and personality if they are not empty
         if personality:
-            role = ", ".join([role, personality])
+            role_backstory_traits = ", ".join([role_backstory_traits, personality])
 
         ai_config = construct_main_ai_config(
             config,
             name=name,
-            role=role,
+            role=role_backstory_traits,
             goals=goals,
         )
 

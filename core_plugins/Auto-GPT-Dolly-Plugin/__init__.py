@@ -43,12 +43,25 @@ class Message(TypedDict):
 
 COMMANDS = {
     "clone_agent": {
-        "description": "Deploy a copy of the current agent to perform tasks in parallel.",
+        "description": "Deploy a copy of current agent.",
         "aliases": ["clone", "replicate", "create_replica"],
     },
-    "create_agent": {
-        "description": "Deploy a new, specialized agent to perform tasks in parallel.",
-        "aliases": ["create_agent", "create_agent", "call_agent", "spawn"],
+    "create_bg_agent": {
+        "description": "Deploy background non-interactive agent.",
+        "aliases": ["bgbot", "bgagent", "create_non_interactive"],
+    },
+    "create_bg_agent_from_persona": {
+        "description": "Deploy backgrond non-interactive agent from persona.",
+        "aliases": ["bgpers"],
+    },
+    "create_interactive_agent": {
+        "description": "Deploy interactive agent.",
+        "aliases": [
+            "bot",
+            "agent",
+            "spawn",
+            "chatbot",
+        ],
     },
 }
 
@@ -57,7 +70,7 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
     def __init__(self):
         super().__init__()
         self.name = "Auto-GPT Dolly Plugin"
-        self.version = "0.4.0"
+        self.version = "0.3.0"
         self.description = "Dolly brings multi-agent support to Auto-GPT."
         self.author = "lcOrp"
 
@@ -90,6 +103,7 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
         """
         This method is called just after the generate_prompt is called,
           but actually before the prompt is generated.
+          It can alter the prompt.
 
         Parameters:
             prompt (PromptGenerator): The prompt generator.
@@ -134,6 +148,16 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
                 # TODO: Log error
                 pass
 
+        # Add agent personas to prompt resources
+        try:
+            from turbo.personas.manager import PersonaManager
+
+            agent_roles = PersonaManager.get_all()
+            prompt.add_resource("AGENT TYPES; " + ", ".join(agent_roles))
+
+        except ImportError:
+            pass
+
         return prompt
 
     def can_handle_post_prompt(self) -> bool:
@@ -152,11 +176,16 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
 
         Returns:
             bool: True if the plugin can handle the on_response method."""
-        return False
+        return True  # False
 
     def on_response(self, response: str, *args, **kwargs) -> Optional[str]:
-        """This method is called when a response is received from the model."""
-        pass
+        """
+        This method is called when a response is received from the model.
+            It can alter the response or return a new response.
+        Returns:
+            Optional[str]: The resulting response.
+        """
+        return response
 
     def can_handle_on_planning(self) -> bool:
         """
@@ -165,19 +194,21 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
 
         Returns:
             bool: True if the plugin can handle the on_planning method."""
-        return False
+        return True  # False
 
     def on_planning(
         self, prompt: PromptGenerator, messages: list[Message]
     ) -> Optional[str]:
         """
-        This method is called before the planning chat completion is done.
-
+        This method is called before the planning chat completion is done. It can return a string response that gets
+            added as a system message to the chat.
         Parameters:
             prompt (PromptGenerator): The prompt generator.
             messages (list[str]): The list of messages.
+        Returns:
+            Optional[str]:
         """
-        pass
+        return None
 
     def can_handle_post_planning(self) -> bool:
         """
@@ -186,11 +217,12 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
 
         Returns:
             bool: True if the plugin can handle the post_planning method."""
-        return False
+        return True  # False
 
     def post_planning(self, response: str) -> Optional[str]:
         """
         This method is called after the planning chat completion is done.
+        It takes the response from the planning chat completion and can alter it or return a new response.
 
         Parameters:
             response (str): The response.
@@ -198,7 +230,7 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
         Returns:
             str: The resulting response.
         """
-        pass
+        return response
 
     def can_handle_pre_instruction(self) -> bool:
         """
@@ -207,7 +239,7 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
 
         Returns:
             bool: True if the plugin can handle the pre_instruction method."""
-        return False
+        return True  # False
 
     def pre_instruction(self, messages: list[Message]) -> list[Message]:
         """
@@ -219,7 +251,7 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
         Returns:
             list[Message]: The resulting list of messages.
         """
-        pass
+        return messages
 
     def can_handle_on_instruction(self) -> bool:
         """
@@ -228,7 +260,7 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
 
         Returns:
             bool: True if the plugin can handle the on_instruction method."""
-        return False
+        return True  # False
 
     def on_instruction(self, messages: list[Message]) -> Optional[str]:
         """
@@ -249,7 +281,7 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
 
         Returns:
             bool: True if the plugin can handle the post_instruction method."""
-        return False
+        return True  # False
 
     def post_instruction(self, response: str) -> str:
         """
@@ -270,7 +302,7 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
 
         Returns:
             bool: True if the plugin can handle the pre_command method."""
-        return False
+        return True  # False
 
     def pre_command(
         self, command_name: str, arguments: dict[str, Any]
@@ -286,7 +318,7 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
             tuple[str, dict[str, Any]]: The command name and the arguments.
         """
         # Return "write_to_file" => settings file
-        pass
+        return command_name, arguments
 
     def can_handle_post_command(self) -> bool:
         """
@@ -295,11 +327,12 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
 
         Returns:
             bool: True if the plugin can handle the post_command method."""
-        return False
+        return True  # False
 
     def post_command(self, command_name: str, response: str) -> str:
         """
         This method is called after the command is executed.
+            It can alter the response (command result) or return a new response.
 
         Parameters:
             command_name (str): The command name.
@@ -308,7 +341,7 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
         Returns:
             str: The resulting response.
         """
-        pass
+        return response
 
     def can_handle_chat_completion(
         self, messages: dict[Any, Any], model: str, temperature: float, max_tokens: int
@@ -325,7 +358,7 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
 
           Returns:
               bool: True if the plugin can handle the chat_completion method."""
-        return False
+        return True  # False
 
     def handle_chat_completion(
         self, messages: list[Message], model: str, temperature: float, max_tokens: int
@@ -342,6 +375,7 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
         Returns:
             str: The resulting response.
         """
+        return None
 
     def can_handle_text_embedding(self, text: str) -> bool:
         """This method is called to check that the plugin can
@@ -350,7 +384,7 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
             text (str): The text to be convert to embedding.
           Returns:
               bool: True if the plugin can handle the text_embedding method."""
-        return False
+        return True  # False
 
     def handle_text_embedding(self, text: str) -> list:
         """This method is called when the chat completion is done.
@@ -359,7 +393,7 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
         Returns:
             list: The text embedding.
         """
-        pass
+        return text
 
     def can_handle_user_input(self, user_input: str) -> bool:
         """This method is called to check that the plugin can
@@ -370,7 +404,7 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
 
         Returns:
             bool: True if the plugin can handle the user_input method."""
-        return False
+        return True  # False
 
     def user_input(self, user_input: str) -> str:
         """This method is called to request user input to the user.
@@ -389,7 +423,7 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
 
         Returns:
             bool: True if the plugin can handle the report method."""
-        return False
+        return True  # False
 
     def report(self, message: str) -> None:
         """This method is called to report a message to the user.
@@ -397,3 +431,4 @@ class AutoGPTDollyPlugin(AutoGPTPluginTemplate):
         Args:
             message (str): The message to report.
         """
+        return None

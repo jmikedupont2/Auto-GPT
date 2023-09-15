@@ -7,6 +7,7 @@ import json
 import os
 import sys
 import zipfile
+from itertools import chain
 from pathlib import Path
 from typing import TYPE_CHECKING, List
 from urllib.parse import urlparse
@@ -217,11 +218,15 @@ def scan_plugins(config: Config, debug: bool = False) -> List[AutoGPTPluginTempl
     """
     loaded_plugins = []
     # Generic plugins
-    plugins_path = Path(config.plugins_dir)
-
     plugins_config = config.plugins_config
     # Directory-based plugins
-    for plugin_path in [f.path for f in os.scandir(config.plugins_dir) if f.is_dir()]:
+    plugin_paths = [f.path for f in os.scandir(config.plugins_dir) if f.is_dir()]
+    core_plugin_paths = [
+        f.path for f in os.scandir(config.core_plugins_dir) if f.is_dir()
+    ]
+    # combine core and user plugins
+    plugin_paths.extend(core_plugin_paths)
+    for plugin_path in plugin_paths:
         # Avoid going into __pycache__ or other hidden directories
         if plugin_path.startswith("__"):
             continue
@@ -251,7 +256,9 @@ def scan_plugins(config: Config, debug: bool = False) -> List[AutoGPTPluginTempl
                 loaded_plugins.append(class_obj())
 
     # Zip-based plugins
-    for plugin in plugins_path.glob("*.zip"):
+    plugins_path = Path(config.plugins_dir)
+    core_plugins_path = Path(config.core_plugins_dir)
+    for plugin in chain(plugins_path.glob("*.zip"), core_plugins_path.glob("*.zip")):
         if moduleList := inspect_zip_for_modules(str(plugin), debug):
             for module in moduleList:
                 plugin = Path(plugin)

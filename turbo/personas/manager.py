@@ -34,7 +34,7 @@ class PersonaManager:
 
         logger.typewriter_log("\n")
         logger.typewriter_log(
-            f"{count} PERSONAS{'S' if count > 1 else ''} FOUND: ", Fore.CYAN
+            f"{count} PERSONA{'S' if count > 1 else ''} FOUND: ", Fore.CYAN
         )
         logger.typewriter_log("================================", Fore.CYAN)
 
