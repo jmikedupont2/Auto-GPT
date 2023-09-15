@@ -103,7 +103,6 @@ import click
     "--personas",
     "--presets",
     is_flag=True,
-    default=True,
     help="List available AI config Personas and ask the user to choose one.",
 )
 @click.pass_context
@@ -143,6 +142,10 @@ def main(
     # Turbo: skip_news = True
     skip_news = True
 
+    if personas:
+        PersonaManager.list()
+        return
+
     if persona:
         ai_settings, prompt_settings = PersonaManager.load(persona)
         ai_name = ai_role = ai_goal = None
@@ -154,8 +157,9 @@ def main(
     # Default to turbo prompts
     if not (persona or persona_prompts_only or prompt_settings):
         prompt_settings = PersonaManager.load_prompts("turbo")
-    else:
-        personas = False  # Don't prompt for personas if we've selected one
+        personas = (
+            True  # Set to True to display persona list and prompt user to choose one
+        )
 
     if ctx.invoked_subcommand is None:
         run_auto_gpt(
