@@ -5,6 +5,4 @@
 !prompt_settings.yaml
 !config/prompt_settings.yaml
 
-*.md
 *.png
-!BULLETIN.md

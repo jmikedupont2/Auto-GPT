@@ -18,7 +18,7 @@ GPT-4 is way more powerful than 3.5-turbo. It experiences fewer loops and JSON f
 
 I believe GPT-4 shall become cheaper & faster over time, but until then, it needs all the help it can get :-D.
 
-Turbo tries to squeeze every bit of time and cost saving out by slightly redesigning parts of the loop, prompts and commands. 
+Turbo tries to squeeze every bit of time and cost saving out by testing various techniques including reducing verbosity of the command-json exchange 
 
 # Better pair coding
 
