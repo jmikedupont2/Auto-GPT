@@ -22,10 +22,11 @@ _QUEUE_SEMAPHORE = Semaphore(
 class TextToSpeechProvider:
     def __init__(self, config: Config):
         self._config = config
-        self._default_voice_engine, self._voice_engine = self._get_voice_engine(config)
+        #self._default_voice_engine, self._voice_engine = self._get_voice_engine(config)
 
     def say(self, text, voice_index: int = 0) -> None:
         def _speak() -> None:
+            return None
             success = self._voice_engine.say(text, voice_index)
             if not success:
                 self._default_voice_engine.say(text, voice_index)
