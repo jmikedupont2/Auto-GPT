@@ -6,7 +6,7 @@ import os
 from typing import TYPE_CHECKING
 
 import requests
-#from playsound import playsound
+#from playsounds import playsound
 
 if TYPE_CHECKING:
     from autogpt.config import Config

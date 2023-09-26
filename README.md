@@ -1,6 +1,14 @@
-# 🌟 AutoGPT: the heart of the open-source agent ecosystem
+# hack of 🌟 AutoGPT
 
-[![Discord Follow](https://dcbadge.vercel.app/api/server/autogpt?style=flat)](https://discord.gg/autogpt) [![GitHub Repo stars](https://img.shields.io/github/stars/Significant-Gravitas/AutoGPT?style=social)](https://github.com/Significant-Gravitas/AutoGPT/stargazers) [![Twitter Follow](https://img.shields.io/twitter/follow/auto_gpt?style=social)](https://twitter.com/Auto_GPT) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+```
+export OPENAI_API_KEY=fdsfsd
+export OPENAI_API_BASE=http://127.0.0.1:5000/v1
+poetry shell
+python -m autogpt
+```
+
+
+
 
 **AutoGPT** is your go-to toolkit for supercharging agents. With its modular and extensible framework, you're empowered to focus on:
 

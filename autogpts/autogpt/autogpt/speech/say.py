@@ -43,13 +43,14 @@ class TextToSpeechProvider:
     def _get_voice_engine(config: Config) -> tuple[VoiceBase, VoiceBase]:
         """Get the voice engine to use for the given configuration"""
         tts_provider = config.text_to_speech_provider
-        if tts_provider == "elevenlabs":
-            voice_engine = ElevenLabsSpeech(config)
-        elif tts_provider == "macos":
-            voice_engine = MacOSTTS(config)
-        elif tts_provider == "streamelements":
-            voice_engine = StreamElementsSpeech(config)
-        else:
-            voice_engine = GTTSVoice(config)
+        #if tts_provider == "elevenlabs":
+        #    voice_engine = ElevenLabsSpeech(config)
+        #elif tts_provider == "macos":
+        #    voice_engine = MacOSTTS(config)
+        #elif tts_provider == "streamelements":
+        #    voice_engine = StreamElementsSpeech(config)
+        #else:
+            #voice_engine = GTTSVoice(config)
 
-        return GTTSVoice(config), voice_engine
+        #return GTTSVoice(config), voice_engine
+        return None
