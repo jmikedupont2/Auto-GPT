@@ -6,7 +6,7 @@ import os
 from typing import TYPE_CHECKING
 
 import requests
-from playsound import playsound
+#from playsound import playsound
 
 if TYPE_CHECKING:
     from autogpt.config import Config
@@ -80,8 +80,8 @@ class ElevenLabsSpeech(VoiceBase):
         if response.status_code == 200:
             with open("speech.mpeg", "wb") as f:
                 f.write(response.content)
-            playsound("speech.mpeg", True)
-            os.remove("speech.mpeg")
+            #playsound("speech.mpeg", True)
+            #os.remove("speech.mpeg")
             return True
         else:
             logger.warn("Request failed with status code:", response.status_code)

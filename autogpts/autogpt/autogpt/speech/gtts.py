@@ -4,7 +4,7 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
 
-import gtts
+#import gtts
 from playsound import playsound
 
 if TYPE_CHECKING:

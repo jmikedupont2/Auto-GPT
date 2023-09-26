@@ -9,10 +9,10 @@ if TYPE_CHECKING:
     from autogpt.config import Config
 
 from .base import VoiceBase
-from .eleven_labs import ElevenLabsSpeech
-from .gtts import GTTSVoice
-from .macos_tts import MacOSTTS
-from .stream_elements_speech import StreamElementsSpeech
+#from .eleven_labs import ElevenLabsSpeech
+#from .gtts import GTTSVoice
+#from .macos_tts import MacOSTTS
+#from .stream_elements_speech import StreamElementsSpeech
 
 _QUEUE_SEMAPHORE = Semaphore(
     1
