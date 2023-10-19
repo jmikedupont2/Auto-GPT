@@ -9,11 +9,14 @@ from typing import Any, Optional
 import click
 import pytest
 import toml
+from dotenv import load_dotenv
 from helicone.lock import HeliconeLockManager
 
 from agbenchmark.app import app
 from agbenchmark.reports.ReportManager import SingletonReportManager
 from agbenchmark.utils.data_types import AgentBenchmarkConfig
+
+load_dotenv()
 
 BENCHMARK_START_TIME_DT = datetime.now(timezone.utc)
 BENCHMARK_START_TIME = BENCHMARK_START_TIME_DT.strftime("%Y-%m-%dT%H:%M:%S+00:00")
@@ -108,7 +111,7 @@ def run_benchmark(
     for key, value in vars(agent_benchmark_config).items():
         print(f"{key}: {value}")
 
-    pytest_args = ["-vs"]
+    pytest_args = ["-vs", "--disable-warnings"]
     if keep_answers:
         pytest_args.append("--keep-answers")
 
@@ -270,9 +273,6 @@ def version():
         "version"
     ]
     print(f"Benchmark Tool Version {version}")
-
-
-from pathlib import Path
 
 
 def serve():

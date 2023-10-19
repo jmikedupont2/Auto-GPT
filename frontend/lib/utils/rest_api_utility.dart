@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 class RestApiUtility {
   String _agentBaseUrl;
   final String _benchmarkBaseUrl = "http://127.0.0.1:8080/ap/v1";
+  final String _leaderboardBaseUrl = "https://leaderboard.agpt.co";
 
   RestApiUtility(this._agentBaseUrl);
 
@@ -14,7 +15,16 @@ class RestApiUtility {
   }
 
   String _getEffectiveBaseUrl(ApiType apiType) {
-    return apiType == ApiType.agent ? _agentBaseUrl : _benchmarkBaseUrl;
+    switch (apiType) {
+      case ApiType.agent:
+        return _agentBaseUrl;
+      case ApiType.benchmark:
+        return _benchmarkBaseUrl;
+      case ApiType.leaderboard:
+        return _leaderboardBaseUrl;
+      default:
+        return _agentBaseUrl;
+    }
   }
 
   Future<Map<String, dynamic>> get(String endpoint,
@@ -40,7 +50,25 @@ class RestApiUtility {
     if (response.statusCode == 200 || response.statusCode == 201) {
       return json.decode(response.body);
     } else {
-      throw Exception('Failed to post data');
+      // TODO: We are bubbling up the full response to show better errors on the UI.
+      // Let's put some thought into how we would like to structure this.
+      throw response;
+    }
+  }
+
+  Future<Map<String, dynamic>> put(
+      String endpoint, Map<String, dynamic> payload,
+      {ApiType apiType = ApiType.agent}) async {
+    final effectiveBaseUrl = _getEffectiveBaseUrl(apiType);
+    final response = await http.put(
+      Uri.parse('$effectiveBaseUrl/$endpoint'),
+      body: json.encode(payload),
+      headers: {"Content-Type": "application/json"},
+    );
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to update data with PUT request');
     }
   }
 
